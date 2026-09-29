@@ -132,7 +132,7 @@ export default function Dashboard() {
     
     if (actualTheme === 'light') {
       return (
-        <div className="flex flex-col gap-1 w-full" title="Progress breakdown">
+        <div className="flex flex-col gap-1 w-full min-w-0" title="Progress breakdown">
           <div className="flex justify-between items-end mb-1">
             <span className={`text-[10px] font-bold uppercase tracking-wider ${urgent ? 'text-primary' : 'text-muted'}`}>{copy.powerLevelShort}</span>
             <span className={`text-xs font-black ${urgent ? 'text-foreground' : 'text-foreground'}`}>{level * 10}%</span>
@@ -145,7 +145,7 @@ export default function Dashboard() {
     }
     
     return (
-      <div className="flex flex-col gap-1 relative group/ki" tabIndex={0}>
+      <div className="flex flex-col gap-1 relative group/ki min-w-0" tabIndex={0}>
         <div className="flex justify-between items-end">
           <span className={`text-[10px] font-black uppercase tracking-widest ${urgent ? 'text-primary text-glow-orange' : 'text-[var(--text-gray-400)]'}`}>{copy.powerLevelShort}</span>
           <span className={`text-xs font-black ${urgent ? 'text-foreground' : 'text-gray-300'}`}>{ki.total.toLocaleString()} KI</span>
@@ -411,12 +411,12 @@ export default function Dashboard() {
                 key={h.id} 
                 onClick={() => setSelectedId(h.id)}
                 className={actualTheme === 'dark' 
-                  ? `bg-card/90 backdrop-blur-md rounded p-1 border cursor-pointer group relative overflow-visible transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-2 ${
+                  ? `bg-card/90 min-w-0 backdrop-blur-md rounded p-1 border cursor-pointer group relative overflow-visible transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-2 ${
                       isUrgent 
                         ? 'border-primary shadow-[0_4px_20px_rgba(245,124,0,0.2)] hover:shadow-[0_15px_40px_rgba(245,124,0,0.5)]' 
                         : 'border-borderMuted hover:border-primaryLight/60 hover:shadow-[0_15px_30px_rgba(255,152,0,0.25)]'
                     }`
-                  : `bg-card rounded-xl p-6 border cursor-pointer group relative overflow-visible transition-all duration-200 hover:-translate-y-1 shadow-sm hover:shadow-md ${
+                  : `bg-card min-w-0 rounded-xl p-6 border cursor-pointer group relative overflow-visible transition-all duration-200 hover:-translate-y-1 shadow-sm hover:shadow-md ${
                       isUrgent ? 'border-primary/50' : 'border-borderSubtle hover:border-borderMuted'
                     }`
                 }
@@ -428,7 +428,7 @@ export default function Dashboard() {
                   }`}></div>
                 )}
                 
-                <div className={actualTheme === 'dark' ? "bg-[#0c0c0c] h-full w-full rounded-sm p-6 relative z-10 flex flex-col" : "h-full w-full relative z-10 flex flex-col"}>
+                <div className={actualTheme === 'dark' ? "bg-[#0c0c0c] h-full w-full min-w-0 rounded-sm p-6 relative z-10 flex flex-col" : "h-full w-full min-w-0 relative z-10 flex flex-col"}>
                   {/* Subtle emblem watermark */}
                   {actualTheme === 'dark' && <div className="absolute top-2 right-2 text-6xl kanji-emblem text-foreground opacity-[0.02] pointer-events-none">悟</div>}
 
@@ -447,7 +447,7 @@ export default function Dashboard() {
                           </>
                         )}
                       </div>
-                      <h3 className={`font-black text-2xl leading-tight mb-2 uppercase transition-colors text-foreground ${
+                      <h3 className={`font-black text-2xl leading-tight mb-2 uppercase transition-colors text-foreground break-words hyphens-auto ${
                         actualTheme === 'dark' 
                           ? (isUrgent ? 'group-hover:text-glow-orange' : 'group-hover:text-primaryLight')
                           : 'group-hover:text-primary'
@@ -459,7 +459,7 @@ export default function Dashboard() {
                     <PowerBar ki={ki} urgent={isUrgent} />
                   </div>
                   
-                  <div className={actualTheme === 'dark' ? "mb-6 bg-black/40 p-3 rounded border border-borderSubtle" : "mb-6 p-4 rounded-lg bg-panelAlt border border-borderSubtle"}>
+                  <div className={actualTheme === 'dark' ? "mb-6 min-w-0 bg-black/40 p-3 rounded border border-borderSubtle" : "mb-6 min-w-0 p-4 rounded-lg bg-panelAlt border border-borderSubtle"}>
                     <DragonBallProgress 
                       stages={stages} 
                       activeStageNumber={activeStage?.stageNumber} 

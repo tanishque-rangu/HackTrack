@@ -120,7 +120,7 @@ export function DragonBallProgress({ stages, onStageClick, activeStageNumber }: 
     return () => window.removeEventListener('scroll', handleScroll, { capture: true });
   }, []);
   return (
-    <div className="flex flex-col gap-3 relative">
+    <div className="flex flex-col gap-3 relative min-w-0">
       <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-1">
         <span className={`text-[10px] font-black uppercase tracking-widest ${actualTheme === 'dark' ? 'text-primary text-glow-orange' : 'text-muted'}`}>{copy.dragonBallProgress}</span>
         <span className="text-xs font-black text-foreground">{copy.ballsCollected(completedCount)}</span>
