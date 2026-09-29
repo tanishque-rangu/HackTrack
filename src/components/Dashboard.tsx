@@ -332,7 +332,7 @@ export default function Dashboard() {
           
           {/* Stat panel for Dark Mode */}
           {actualTheme === 'dark' ? (
-            <div className={`absolute top-0 right-0 h-full w-1/3 flex flex-col justify-center border-l border-borderMuted pl-6 space-y-4 pointer-events-none`}>
+            <div className={`relative md:absolute top-0 right-0 h-auto md:h-full w-full md:w-1/3 flex flex-col justify-center border-t md:border-t-0 md:border-l border-borderMuted mt-4 md:mt-0 pt-4 md:pt-0 md:pl-6 space-y-4 pointer-events-none`}>
               <div className="group/total pointer-events-auto relative w-full" tabIndex={0}>
                 <span className="text-[10px] font-black text-[var(--text-gray-400)] uppercase tracking-widest block mb-1">{copy.totalPower}</span>
                 <div className="flex justify-between items-end relative">
@@ -358,16 +358,16 @@ export default function Dashboard() {
               </div>
             </div>
           ) : (
-            <div className="absolute top-0 right-0 h-full flex flex-col justify-center pr-8 pointer-events-none">
-              <div className="pointer-events-auto flex flex-col items-end text-right">
+            <div className="relative md:absolute top-0 right-0 h-auto md:h-full flex flex-col justify-center mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-borderSubtle md:pr-8 pointer-events-none w-full md:w-auto">
+              <div className="pointer-events-auto flex flex-col md:items-end text-left md:text-right">
                 <span className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">{copy.totalPower}</span>
                 <div className="flex items-baseline gap-2">
                    <span className="text-2xl font-black text-foreground">{globalProgress.power.total.toLocaleString()}</span>
                    <span className="text-xs font-bold text-muted">PTS</span>
                 </div>
-                <div className="mt-3 text-right">
+                <div className="mt-3 text-left md:text-right">
                    <span className="text-[10px] font-bold text-muted uppercase tracking-widest block mb-1">{copy.currentMission}</span>
-                   <span className="text-xs font-black text-primary bg-primary/10 px-2 py-1 rounded-full">{globalProgress.currentStage}</span>
+                   <span className="text-xs font-black text-primary bg-primary/10 px-2 py-1 rounded-full inline-block">{globalProgress.currentStage}</span>
                 </div>
               </div>
             </div>

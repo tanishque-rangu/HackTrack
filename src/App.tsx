@@ -70,7 +70,7 @@ function AppContent() {
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4">
             {/* Header Stats */}
             {actualTheme === 'dark' ? (
               <div className="flex items-center gap-1.5 px-4 py-1.5 bg-card/80 border border-primary/20 rounded-full box-glow-orange relative group" title={`${completedBalls} / 7 Dragon Balls Collected`}>
