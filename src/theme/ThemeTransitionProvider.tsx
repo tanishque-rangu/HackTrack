@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import type { ReactNode } from 'react';
 import { useTheme } from './ThemeProvider';
 import { ThemeTransitionOverlay } from './ThemeTransitionOverlay';
+import { playThemeAudio } from './sound';
 
 interface ThemeTransitionContextType {
   changeTheme: (next: 'dark' | 'light' | 'system', originRect?: DOMRect | null) => void;
@@ -72,12 +73,17 @@ export const ThemeTransitionProvider: React.FC<{ children: ReactNode }> = ({ chi
       }
 
       const dir = actualTheme === 'light' ? 'light-to-dark' : 'dark-to-light';
+      
+      if (!effectiveReducedEffects) {
+        playThemeAudio(dir === 'light-to-dark' ? 'power-up' : 'power-down', soundEnabled);
+      }
+
       setDirection(dir);
       setNextTheme(next);
       setOriginRect(rect || null);
       setIsPlaying(true);
     },
-    [isPlaying, actualTheme, setTheme]
+    [isPlaying, actualTheme, setTheme, effectiveReducedEffects, soundEnabled]
   );
 
   // Lock scroll while transition is playing

@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GokuSilhouette } from './GokuSilhouette';
-import { playThemeAudio } from './sound';
 
 interface ThemeTransitionOverlayProps {
   isPlaying: boolean;
@@ -70,9 +69,6 @@ export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
         if (!themeSwappedRef.current) onThemeSwap();
       };
     }
-
-    // Play Web Audio sound
-    playThemeAudio(direction === 'light-to-dark' ? 'power-up' : 'power-down', soundEnabled);
 
     if (direction === 'light-to-dark') {
       // LIGHT -> DARK (Full ~19.0s Sequence)
