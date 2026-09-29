@@ -91,3 +91,28 @@ alter publication supabase_realtime add table public.unit_members;
 alter publication supabase_realtime add table public.projects;
 alter publication supabase_realtime add table public.registrations;
 alter publication supabase_realtime add table public.messages;
+
+-- Enable RLS and create permissive policies for MVP
+ALTER TABLE public.squads ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public access" ON public.squads FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE public.members ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public access" ON public.members FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE public.hackathons ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public access" ON public.hackathons FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE public.units ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public access" ON public.units FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE public.unit_members ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public access" ON public.unit_members FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public access" ON public.projects FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE public.registrations ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public access" ON public.registrations FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public access" ON public.messages FOR ALL USING (true) WITH CHECK (true);
