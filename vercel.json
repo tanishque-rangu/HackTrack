@@ -1,33 +1,5 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "services": {
-    "app": {
-      "root": ".",
-      "framework": "vite"
-    },
-    "notebooklm": {
-      "root": "temp_skills_repo2/skills/notebooklm",
-      "runtime": "python"
-    },
-    "postgres-readonly-queries": {
-      "root": "temp_skills_repo2/skills/postgres-readonly-queries",
-      "runtime": "python"
-    },
-    "slack-gif-creator": {
-      "root": "temp_skills_repo2/skills/slack-gif-creator",
-      "runtime": "python"
-    },
-    "tools": {
-      "root": "temp_skills_repo2/tools",
-      "runtime": "python"
-    }
-  },
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": {
-        "service": "app"
-      }
-    }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
