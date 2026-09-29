@@ -1,0 +1,209 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700;900&family=Noto+Sans+JP:wght@700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root, .dark {
+  color-scheme: dark;
+  --bg: #070707;
+  --fg: #FFF4E0;
+  --card: #0a0a0a;
+  --card-fg: #FFF4E0;
+  --primary: #F57C00;
+  --primary-light: #FF9800;
+  --primary-fg: #070707;
+  --accent: #1E88E5;
+  --accent-fg: #070707;
+  --danger: #d32f2f;
+  --success: #388e3c;
+  --warning: #FFC107;
+  --darkblue: #123A70;
+  --border-white-5: rgba(255,255,255,0.05);
+  --border-white-10: rgba(255,255,255,0.1);
+  --panel-bg: #0f0f0f;
+  --panel-alt-bg: #151515;
+  --black-overlay: rgba(0,0,0,0.8);
+  --text-gray-400: #9ca3af;
+  --text-gray-500: #6b7280;
+  
+  /* DBZ Toggles */
+  --kanji-opacity: 0.03;
+  --dbz-display: block;
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.5), 0 2px 4px -1px rgba(0,0,0,0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.6), 0 4px 6px -2px rgba(0,0,0,0.4);
+}
+
+.light {
+  color-scheme: light;
+  --bg: #FFF8F1;
+  --fg: #1C1917;
+  --card: #FFFFFF;
+  --card-fg: #1C1917;
+  --primary: #F97316; /* accent */
+  --primary-light: #C2410C; /* accent-ink */
+  --primary-fg: #FFFFFF;
+  --accent: #FFEDD5; /* accent-soft */
+  --accent-fg: #EA580C; /* accent-hover */
+  --danger: #DC2626;
+  --success: #059669;
+  --warning: #CA8A04;
+  --darkblue: #1C1917; /* ink */
+  --border-white-5: #F1E4D8; /* border-line */
+  --border-white-10: #E5D3C2; /* border-strong */
+  --panel-bg: #FFFFFF;
+  --panel-alt-bg: #FFF3E6; /* bg-subtle */
+  --black-overlay: rgba(255,255,255,0.8);
+  --text-gray-400: #57534E; /* ink-secondary */
+  --text-gray-500: #A8A29E; /* ink-muted */
+  
+  /* DBZ Toggles */
+  --kanji-opacity: 0;
+  --dbz-display: none;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(120, 53, 15, 0.06);
+  --shadow-md: 0 4px 12px rgba(120, 53, 15, 0.08);
+  --shadow-lg: 0 8px 24px rgba(120, 53, 15, 0.08);
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased font-sans;
+    -webkit-tap-highlight-color: transparent;
+    background-color: var(--bg);
+    background-image: 
+      radial-gradient(circle at 50% -10%, rgba(245, 124, 0, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 0% 100%, rgba(30, 136, 229, 0.05) 0%, transparent 40%),
+      url('data:image/svg+xml;utf8,<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="300" font-family="Noto Sans JP, sans-serif" font-weight="900" fill="rgba(245, 124, 0, var(--kanji-opacity))">悟</text></svg>'),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><path d="M54.627 0l.83.83v58.34l-.83.83H5.373l-.83-.83V.83l.83-.83h49.254zm-1.83 2H7.204v56h45.592V2zM27 49v-4.505l-8.5-8.5v-12l8.5-8.5V11h6v4.495l8.5 8.5v12l-8.5 8.5V49h-6zm-4-15.656l6 6v-16.68l-6-6v16.68zm14 0v-16.68l-6 6v16.68l6-6z" fill="rgba(245, 124, 0, 0.015)" fill-rule="evenodd"/></svg>');
+    background-size: 100% 100%, 100% 100%, 800px 800px, 120px 120px;
+    background-position: top center, bottom left, center center, top left;
+    background-attachment: fixed, fixed, fixed, fixed;
+  }
+  
+  .light body {
+    background-image: none;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    @apply tracking-tight;
+  }
+  
+  *:focus-visible {
+    outline: 2px solid theme('colors.primaryLight');
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+}
+
+@layer utilities {
+  .text-glow-orange {
+    text-shadow: 0 0 10px rgba(245, 124, 0, 0.6), 0 0 25px rgba(245, 124, 0, 0.4), 0 0 40px rgba(245, 124, 0, 0.2);
+  }
+  
+  .text-glow-yellow {
+    text-shadow: 0 0 10px rgba(255, 193, 7, 0.8), 0 0 25px rgba(255, 193, 7, 0.5);
+  }
+
+  .box-glow-orange {
+    box-shadow: 0 0 20px rgba(245, 124, 0, 0.25), inset 0 0 15px rgba(245, 124, 0, 0.1);
+  }
+
+  .box-glow-urgent {
+    box-shadow: 0 0 30px rgba(255, 152, 0, 0.4), inset 0 0 20px rgba(255, 152, 0, 0.2);
+  }
+
+  .dragon-ball {
+    background: radial-gradient(circle at 30% 30%, #FFB74D, #F57C00 60%, #E65100 100%);
+    box-shadow: inset -2px -2px 6px rgba(0,0,0,0.5), inset 2px 2px 6px rgba(255,255,255,0.6), 0 0 10px rgba(245,124,0,0.4);
+    position: relative;
+    border-radius: 50%;
+  }
+  
+  .dragon-ball::after {
+    content: '';
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    width: 25%;
+    height: 15%;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.4);
+    transform: rotate(-45deg);
+  }
+
+  .dragon-ball-dark {
+    background: radial-gradient(circle at 30% 30%, #424242, #212121 60%, #000000 100%);
+    box-shadow: inset -2px -2px 6px rgba(0,0,0,0.8), inset 2px 2px 6px rgba(255,255,255,0.2), 0 0 5px rgba(0,0,0,0.5);
+    position: relative;
+    border-radius: 50%;
+  }
+  
+  .dragon-ball-dark::after {
+    content: '';
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    width: 25%;
+    height: 15%;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    transform: rotate(-45deg);
+  }
+  
+  .kanji-emblem {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 900;
+  }
+}
+
+/* Shenron Silhouette */
+.shenron-bg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500"><path d="M 800 50 Q 750 150 850 250 T 700 450 T 850 550" fill="none" stroke="rgba(245,124,0,0.04)" stroke-width="60" stroke-linecap="round"/><path d="M 780 40 L 730 10 L 810 0 Z" fill="rgba(245,124,0,0.05)"/></svg>');
+  background-size: cover;
+  background-position: right top;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 0;
+  display: var(--dbz-display);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar for a premium DBZ look */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(245, 124, 0, 0.5);
+  border-radius: 10px;
+  border: 2px solid #070707; /* Floating effect against dark background */
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 124, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

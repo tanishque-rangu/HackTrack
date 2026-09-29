@@ -1,0 +1,318 @@
+import React, { useEffect, useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { GokuSilhouette } from './GokuSilhouette';
+import { playThemeAudio } from './sound';
+
+interface ThemeTransitionOverlayProps {
+  isPlaying: boolean;
+  direction: 'light-to-dark' | 'dark-to-light';
+  originRect: DOMRect | null;
+  reducedEffects: boolean;
+  soundEnabled: boolean;
+  onThemeSwap: () => void;
+  onComplete: () => void;
+  onSkip: () => void;
+}
+
+export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
+  isPlaying,
+  direction,
+  originRect,
+  reducedEffects,
+  soundEnabled,
+  onThemeSwap,
+  onComplete,
+  onSkip,
+}) => {
+  const [phase, setPhase] = useState<'idle' | 'charging' | 'flash' | 'complete'>('idle');
+  const [hairColor, setHairColor] = useState<string>(direction === 'light-to-dark' ? '#070707' : '#FFD54F');
+  const [isSuperSaiyan, setIsSuperSaiyan] = useState<boolean>(direction === 'dark-to-light');
+  const themeSwappedRef = useRef(false);
+
+  // Keyboard escape listener to skip
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onSkip();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPlaying, onSkip]);
+
+  // Main animation sequence controller
+  useEffect(() => {
+    if (!isPlaying) {
+      setPhase('idle');
+      themeSwappedRef.current = false;
+      return;
+    }
+
+    themeSwappedRef.current = false;
+
+    // Reduced motion or reduced effects fallback: short 200ms cross-fade
+    if (reducedEffects) {
+      const swapTimer = setTimeout(() => {
+        onThemeSwap();
+        themeSwappedRef.current = true;
+      }, 100);
+
+      const endTimer = setTimeout(() => {
+        onComplete();
+      }, 200);
+
+      return () => {
+        clearTimeout(swapTimer);
+        clearTimeout(endTimer);
+        if (!themeSwappedRef.current) onThemeSwap();
+      };
+    }
+
+    // Play Web Audio sound
+    playThemeAudio(direction === 'light-to-dark' ? 'power-up' : 'power-down', soundEnabled);
+
+    if (direction === 'light-to-dark') {
+      // LIGHT -> DARK (Full ~1.6s Sequence)
+      // Phase 1: 0.0s - Vignette & Goku Silhouette
+      setPhase('charging');
+      setHairColor('#070707');
+      setIsSuperSaiyan(false);
+
+      // Phase 2: 1.0s - Hair turns gold & aura burst
+      const hairTimer = setTimeout(() => {
+        setHairColor('#FFD54F');
+        setIsSuperSaiyan(true);
+      }, 1000);
+
+      // Phase 3: 1.15s - Smooth Flash Peak & Theme Swap
+      const flashTimer = setTimeout(() => {
+        setPhase('flash');
+        // Swap theme after flash starts reaching full opacity (1200ms)
+        setTimeout(() => {
+          if (!themeSwappedRef.current) {
+            onThemeSwap();
+            themeSwappedRef.current = true;
+          }
+        }, 80);
+      }, 1150);
+
+      // Phase 4: 1.6s - Completion
+      const completeTimer = setTimeout(() => {
+        setPhase('complete');
+        onComplete();
+      }, 1600);
+
+      return () => {
+        clearTimeout(hairTimer);
+        clearTimeout(flashTimer);
+        clearTimeout(completeTimer);
+        if (!themeSwappedRef.current) onThemeSwap();
+      };
+    } else {
+      // DARK -> LIGHT (Short ~0.8s Sequence)
+      // Phase 1: 0.0s - Collapse aura
+      setPhase('charging');
+      setHairColor('#FFD54F');
+      setIsSuperSaiyan(true);
+
+      // Phase 2: 0.25s - Hair turns black
+      const hairTimer = setTimeout(() => {
+        setHairColor('#070707');
+        setIsSuperSaiyan(false);
+      }, 250);
+
+      // Phase 3: 0.45s - Flash Peak & Theme Swap
+      const flashTimer = setTimeout(() => {
+        setPhase('flash');
+        setTimeout(() => {
+          if (!themeSwappedRef.current) {
+            onThemeSwap();
+            themeSwappedRef.current = true;
+          }
+        }, 60);
+      }, 450);
+
+      // Phase 4: 0.8s - Completion
+      const completeTimer = setTimeout(() => {
+        setPhase('complete');
+        onComplete();
+      }, 800);
+
+      return () => {
+        clearTimeout(hairTimer);
+        clearTimeout(flashTimer);
+        clearTimeout(completeTimer);
+        if (!themeSwappedRef.current) onThemeSwap();
+      };
+    }
+  }, [isPlaying, direction, reducedEffects, soundEnabled, onThemeSwap, onComplete]);
+
+  if (!isPlaying) return null;
+
+  // Toggle button position calculation for vignette center
+  const originX = originRect ? originRect.left + originRect.width / 2 : window.innerWidth / 2;
+  const originY = originRect ? originRect.top + originRect.height / 2 : 40;
+
+  // Floating debris particles (24 particles)
+  const particles = Array.from({ length: 24 }).map((_, i) => ({
+    id: i,
+    size: 4 + (i % 5) * 3,
+    initialX: (i % 6 - 2.5) * 60,
+    initialY: 80 + (i % 4) * 30,
+    targetY: -150 - Math.random() * 180,
+    targetX: (i % 6 - 2.5) * 90 + (Math.random() * 40 - 20),
+    delay: (i * 0.04) % 0.4,
+  }));
+
+  // Simple Cross-Fade fallback if reduced effects is true
+  if (reducedEffects) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-[9999] bg-background pointer-events-auto"
+        aria-hidden="true"
+      />
+    );
+  }
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.15 }}
+        onClick={onSkip}
+        className="fixed inset-0 z-[9999] pointer-events-auto select-none overflow-hidden"
+        aria-hidden="true"
+        role="presentation"
+      >
+        {/* Background Dark Vignette centered on toggle button */}
+        <div
+          className="absolute inset-0 transition-opacity duration-300 bg-[#050508]/90"
+          style={{
+            background: `radial-gradient(circle at ${originX}px ${originY}px, rgba(15,23,42,0.7) 0%, rgba(5,5,8,0.95) 70%)`,
+          }}
+        />
+
+        {/* Screen Shake Container */}
+        <motion.div
+          animate={
+            direction === 'light-to-dark' && phase === 'charging'
+              ? {
+                  x: [-3, 3, -4, 4, -2, 2, 0],
+                  y: [-2, 2, -3, 3, -1, 1, 0],
+                }
+              : { x: 0, y: 0 }
+          }
+          transition={{
+            repeat: Infinity,
+            duration: 0.12,
+            ease: 'linear',
+          }}
+          className="relative w-full h-full flex items-center justify-center"
+        >
+          {/* Ki Aura Ring */}
+          <motion.div
+            animate={{
+              scale: isSuperSaiyan ? [1, 1.25, 1.1] : [0.8, 1, 0.9],
+              opacity: phase === 'charging' ? [0.4, 0.9, 0.6] : 0,
+            }}
+            transition={{ repeat: Infinity, duration: 0.3 }}
+            className="absolute w-[360px] h-[360px] rounded-full blur-xl pointer-events-none"
+            style={{
+              background: isSuperSaiyan
+                ? 'radial-gradient(circle, rgba(255,193,7,0.7) 0%, rgba(245,124,0,0.4) 60%, transparent 80%)'
+                : 'radial-gradient(circle, rgba(0,229,255,0.6) 0%, rgba(30,136,229,0.3) 60%, transparent 80%)',
+            }}
+          />
+
+          {/* Electric Shockwaves / Lightning Arcs */}
+          {isSuperSaiyan && (
+            <svg className="absolute w-[420px] h-[420px] pointer-events-none" viewBox="0 0 200 200">
+              <motion.path
+                d="M 40 100 Q 60 70 90 95 T 160 100"
+                stroke="#00E5FF"
+                strokeWidth="3"
+                fill="none"
+                animate={{ opacity: [0, 1, 0, 0.8, 0] }}
+                transition={{ repeat: Infinity, duration: 0.2 }}
+              />
+              <motion.path
+                d="M 100 30 Q 120 70 95 120 T 100 170"
+                stroke="#FFD54F"
+                strokeWidth="2.5"
+                fill="none"
+                animate={{ opacity: [0, 0.9, 0, 1, 0] }}
+                transition={{ repeat: Infinity, duration: 0.25, delay: 0.05 }}
+              />
+            </svg>
+          )}
+
+          {/* Floating Debris Particles */}
+          <div className="absolute w-full h-full flex items-center justify-center pointer-events-none">
+            {particles.map((p) => (
+              <motion.div
+                key={p.id}
+                initial={{
+                  x: p.initialX,
+                  y: p.initialY,
+                  opacity: 0,
+                  scale: 0.5,
+                  rotate: 0,
+                }}
+                animate={{
+                  y: p.targetY,
+                  x: p.targetX,
+                  opacity: [0, 1, 0.8, 0],
+                  scale: [0.5, 1.2, 0.8],
+                  rotate: 360,
+                }}
+                transition={{
+                  duration: direction === 'light-to-dark' ? 1.2 : 0.6,
+                  delay: p.delay,
+                  repeat: Infinity,
+                  ease: 'easeOut',
+                }}
+                className={`absolute rounded-sm ${
+                  isSuperSaiyan ? 'bg-amber-400 shadow-[0_0_8px_#FFC107]' : 'bg-cyan-400 shadow-[0_0_8px_#00E5FF]'
+                }`}
+                style={{ width: p.size, height: p.size }}
+              />
+            ))}
+          </div>
+
+          {/* Goku Silhouette Centerpiece */}
+          <motion.div
+            animate={{
+              scale: isSuperSaiyan ? [1, 1.04, 1] : [0.96, 1, 0.98],
+            }}
+            transition={{ repeat: Infinity, duration: 0.4 }}
+            className="relative z-10"
+          >
+            <GokuSilhouette hairColor={hairColor} isSuperSaiyan={isSuperSaiyan} />
+          </motion.div>
+        </motion.div>
+
+        {/* Peak White Flash Screen Swap Overlay */}
+        <motion.div
+          animate={{
+            opacity: phase === 'flash' ? [0, 1, 1, 0] : 0,
+          }}
+          transition={{
+            duration: 0.45,
+            times: [0, 0.3, 0.7, 1],
+            ease: "easeInOut"
+          }}
+          className="fixed inset-0 z-[10000] bg-white pointer-events-none"
+        />
+      </motion.div>
+    </AnimatePresence>
+  );
+};

@@ -1,0 +1,160 @@
+{
+  "members": ["Varshini", "Vyshnavi", "Koushik", "Tanishque", "Shivaram", "Nivedan"],
+
+  "teamRules": [
+    "Rule 1: No two girls (Varshini, Vyshnavi) are in the same team.",
+    "Rule 2: Koushik and Tanishque are strictly separated across all divided teams.",
+    "Rule 3 (No Partiality & No Offense): Every divided hackathon features a completely unique combination of members, so everyone gets equal opportunity to work with different partners fairly.",
+    "Rule 4 (Flexibility & Comfort): If anyone feels uncomfortable with their assigned team or wishes to request a partner change, say so openly so the group can readjust. The goal is for everyone to collaborate happily."
+  ],
+
+  "hackathons": [
+    {
+      "id": "sankalp",
+      "name": "SANKALP by Satin Finserv",
+      "platform": "Unstop",
+      "format": "Idea Submission -> Shortlisting -> Finale (The Climate Edition)",
+      "registrationDeadline": "2026-09-27",
+      "submissionDeadline": "2026-10-04",
+      "eventDates": "TBD (Shortlisting & Final Build)",
+      "registrationLink": "https://unstop.com/competitions/crp-student-track-sankalp-by-satin-finserv-the-climate-edition-sankalp-by-satin-finserv-the-climate-edition-sat-1749280",
+      "submissionLink": "https://unstop.com/competitions/crp-student-track-sankalp-by-satin-finserv-the-climate-edition-sankalp-by-satin-finserv-the-climate-edition-sat-1749280",
+      "problemStatementLink": "/ps/sankalp.pdf",
+      "notes": "Problem Statement: The Climate Edition - Develop innovative tech solutions focusing on climate change mitigation, sustainable finance, or environmental impact.\n\nAdditional Intel: 3-member split squads (Comb 1). Prize pool: ₹30 Lakhs",
+      "teams": [
+        { "teamLabel": "Team A", "members": ["Varshini", "Koushik", "Shivaram"] },
+        { "teamLabel": "Team B", "members": ["Vyshnavi", "Tanishque", "Nivedan"] }
+      ]
+    },
+    {
+      "id": "vnr-vjiet",
+      "name": "VNR VJIET CSI Hackathon 2026",
+      "platform": "VNR VJIET CSI",
+      "format": "Abstract Submission -> Shortlisting -> 24-Hr Hackathon",
+      "registrationDeadline": "2026-09-30",
+      "submissionDeadline": "2026-09-30",
+      "eventDates": "2026-10-09 (Results) | 2026-10-14 to 2026-10-15 (Event)",
+      "registrationLink": "https://www.vnrvjietcsi.com",
+      "submissionLink": "https://www.vnrvjietcsi.com",
+      "problemStatementLink": "/ps/vnr-vjiet.pdf",
+      "notes": "Problem Statement: Open Innovation - Build any impactful tech solution (Abstract Submission).\n\nAdditional Intel: 3-member split squads (Comb 2)",
+      "teams": [
+        { "teamLabel": "Team A", "members": ["Varshini", "Koushik", "Nivedan"] },
+        { "teamLabel": "Team B", "members": ["Vyshnavi", "Tanishque", "Shivaram"] }
+      ]
+    },
+    {
+      "id": "iqoo",
+      "name": "iQOO 2026 Grand Finale",
+      "platform": "Reskilll",
+      "format": "City Battles -> Grand Finale (Bengaluru)",
+      "registrationDeadline": "2026-10-05",
+      "submissionDeadline": null,
+      "eventDates": "2026-10-09 to 2026-10-11 (Grand Finale, Bengaluru)",
+      "registrationLink": "https://iqoo.reskilll.com/dashboard/iqoo-finale",
+      "submissionLink": "https://iqoo.reskilll.com/dashboard/iqoo-finale",
+      "problemStatementLink": "/ps/iqoo.pdf",
+      "notes": "Problem Statement: Open Innovation - Build a consumer or enterprise tech solution.\n\nAdditional Intel: 3-member split squads (Comb 3). Hyd battle held Sep 26-27.",
+      "teams": [
+        { "teamLabel": "Team A", "members": ["Vyshnavi", "Koushik", "Shivaram"] },
+        { "teamLabel": "Team B", "members": ["Varshini", "Tanishque", "Nivedan"] }
+      ],
+      "projects": [
+        {
+          "team": "Team B",
+          "projectName": "Before You Pay - AI financial decision assistant",
+          "description": "Scans quotations/bills/loans and explains real cost, questionable charges, and next actions. MVP scope: vehicle quotation analyzer.",
+          "buildStatus": "In Progress"
+        }
+      ]
+    },
+    {
+      "id": "tricity",
+      "name": "Tricity AI Hackathon (KITS Warangal)",
+      "platform": "Centle",
+      "format": "36-Hour Onsite Build (2 & 4 Member Split)",
+      "registrationDeadline": "2026-09-20",
+      "registrationNote": "Open now, early bird ended 20-Sep",
+      "submissionDeadline": "2026-10-11",
+      "eventDates": "2026-10-10 to 2026-10-11",
+      "registrationLink": "https://centle.in/tricity/",
+      "submissionLink": "https://centle.in/tricity/",
+      "problemStatementLink": "/ps/tricity.pdf",
+      "notes": "Problem Statement: Will be officially released on October 3rd.\n\nAdditional Intel: Focus on AI, Gen AI, and Agentic AI. Hardware/mixed format.",
+      "teams": [
+        { "teamLabel": "Team A (2)", "members": ["Koushik", "Vyshnavi"] },
+        { "teamLabel": "Team B (4)", "members": ["Varshini", "Tanishque", "Shivaram", "Nivedan"] }
+      ]
+    },
+    {
+      "id": "hack-hyd",
+      "name": "Hack With Hyderabad 3.0",
+      "platform": "Devnovate",
+      "format": "Direct Joining (8-Hour In-Person/Hybrid Build)",
+      "registrationDeadline": "2026-09-28",
+      "submissionDeadline": "2026-10-03",
+      "eventDates": "2026-10-03 at Microsoft Office, Hyderabad",
+      "registrationLink": "https://devnovate.co/event/hack-with-hyderabad-30",
+      "submissionLink": "https://devnovate.co/event/hack-with-hyderabad-30",
+      "problemStatementLink": "/ps/hack-hyd.pdf",
+      "notes": "Problem Statement: Develop innovative Web/App solutions across multiple open tracks.\n\nAdditional Intel: Event confirmed for Oct 3. Prize pool up to $2000.",
+      "teams": [
+        { "teamLabel": "Unified Team", "members": ["Varshini", "Vyshnavi", "Koushik", "Tanishque", "Shivaram", "Nivedan"] }
+      ]
+    },
+    {
+      "id": "hackindia",
+      "name": "AI-First Startup Hackathon (HackIndia)",
+      "platform": "HackIndia",
+      "format": "Online Build (Build a Startup using AI only)",
+      "registrationDeadline": "2026-10-01",
+      "submissionDeadline": "2026-11-01",
+      "eventDates": "2026-09-02 to 2026-11-01 (Ongoing Build)",
+      "registrationLink": "https://hackindia.org/2026/ai-first-startup-hackathon-build-a-startup-using-ai-only",
+      "submissionLink": "https://hackindia.org/2026/ai-first-startup-hackathon-build-a-startup-using-ai-only",
+      "problemStatementLink": "/ps/hackindia.pdf",
+      "notes": "Problem Statement: Build a fully functional Startup MVP exclusively utilizing AI tools and Agentic frameworks.\n\nAdditional Intel: Long-running online build.",
+      "teams": [
+        { "teamLabel": "Unified Team", "members": ["Varshini", "Vyshnavi", "Koushik", "Tanishque", "Shivaram", "Nivedan"] }
+      ]
+    },
+    {
+      "id": "opencv",
+      "name": "OpenCV AI Competition 2026",
+      "platform": "Devpost",
+      "format": "Direct Online Build Submission",
+      "registrationDeadline": "2026-10-26",
+      "submissionDeadline": "2026-10-26",
+      "eventDates": "Ongoing until 2026-10-26",
+      "registrationLink": "https://opencv26.devpost.com",
+      "submissionLink": "https://opencv26.devpost.com",
+      "problemStatementLink": "/ps/opencv.pdf",
+      "notes": "Problem Statement: Build an innovative computer vision or spatial AI application using OpenCV.\n\nAdditional Intel: Registration and final submission share the same deadline",
+      "teams": [
+        { "teamLabel": "Unified Team", "members": ["Varshini", "Vyshnavi", "Koushik", "Tanishque", "Shivaram", "Nivedan"] }
+      ]
+    },
+    {
+      "id": "nebius",
+      "name": "Nebius x NVIDIA Global AI Hackathon",
+      "platform": "Devpost",
+      "format": "Online Build (Must use Nebius Infra + NVIDIA Models)",
+      "registrationDeadline": "2026-10-30",
+      "submissionDeadline": "2026-10-30",
+      "eventDates": "2026-08-26 to 2026-10-30 (Ongoing Build)",
+      "registrationLink": "https://nebiusglobalaihackathon.devpost.com",
+      "submissionLink": "https://nebiusglobalaihackathon.devpost.com",
+      "problemStatementLink": "/ps/nebius.pdf",
+      "notes": "Problem Statement: Develop a breakthrough AI application leveraging LLMs or Agentic workflows.\n\nAdditional Intel: Must use Nebius infra + NVIDIA models",
+      "teams": [
+        { "teamLabel": "Unified Team", "members": ["Varshini", "Vyshnavi", "Koushik", "Tanishque", "Shivaram", "Nivedan"] }
+      ]
+    }
+  ],
+
+  "submissionChecklist": [
+    "Account Verification: every team member has an active, working account on Unstop, Devpost, Centle, and Reskilll before deadline day.",
+    "Code Repositories: create private GitHub repos for development; switch to Public only upon final submission.",
+    "Video Demos: for online submissions (e.g. Devpost), allocate the final 12 hours exclusively for recording the required 3-minute demo video."
+  ]
+}
