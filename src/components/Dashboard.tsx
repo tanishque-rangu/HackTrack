@@ -560,8 +560,9 @@ export default function Dashboard() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-background/70 backdrop-blur-md"
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-background/80 backdrop-blur-md"
+            style={{ perspective: 1200 }}
           >
             {(() => {
               const stages = calculateHackathonStages(selectedHackathon, data);
@@ -570,11 +571,17 @@ export default function Dashboard() {
               
               return (
               <motion.div 
-                initial={{ scale: 0.9, y: 30, opacity: 0 }}
-                animate={{ scale: 1, y: 0, opacity: 1 }}
-                exit={{ scale: 0.95, y: -20, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                className="bg-card w-full max-w-5xl max-h-[90vh] rounded-xl border border-primary/30 shadow-[0_20px_60px_rgba(245,124,0,0.2)] flex flex-col overflow-hidden relative"
+                initial={{ scale: 0.8, y: 60, opacity: 0, rotateX: 15 }}
+                animate={{ scale: 1, y: 0, opacity: 1, rotateX: 0 }}
+                exit={{ scale: 0.95, y: -20, opacity: 0, rotateX: -5 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 300, 
+                  damping: 25, 
+                  mass: 0.8,
+                  opacity: { duration: 0.2 }
+                }}
+                className="bg-card w-full max-w-5xl max-h-[90vh] rounded-xl border border-primary/30 shadow-[0_30px_100px_rgba(245,124,0,0.3)] flex flex-col overflow-hidden relative transform-gpu"
               >
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primaryLight via-primary to-danger z-50"></div>
                 <button 
