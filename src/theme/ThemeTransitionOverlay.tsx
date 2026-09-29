@@ -75,35 +75,35 @@ export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
     playThemeAudio(direction === 'light-to-dark' ? 'power-up' : 'power-down', soundEnabled);
 
     if (direction === 'light-to-dark') {
-      // LIGHT -> DARK (Full ~1.6s Sequence)
+      // LIGHT -> DARK (Full ~19.0s Sequence)
       // Phase 1: 0.0s - Vignette & Goku Silhouette
       setPhase('charging');
       setHairColor('#070707');
       setIsSuperSaiyan(false);
 
-      // Phase 2: 1.0s - Hair turns gold & aura burst
+      // Phase 2: 10.0s - Hair turns gold & aura burst
       const hairTimer = setTimeout(() => {
         setHairColor('#FFD54F');
         setIsSuperSaiyan(true);
-      }, 1000);
+      }, 10000);
 
-      // Phase 3: 1.15s - Smooth Flash Peak & Theme Swap
+      // Phase 3: 18.0s - Smooth Flash Peak & Theme Swap
       const flashTimer = setTimeout(() => {
         setPhase('flash');
-        // Swap theme after flash starts reaching full opacity (1200ms)
+        // Swap theme after flash starts reaching full opacity
         setTimeout(() => {
           if (!themeSwappedRef.current) {
             onThemeSwap();
             themeSwappedRef.current = true;
           }
         }, 80);
-      }, 1150);
+      }, 18000);
 
-      // Phase 4: 1.6s - Completion
+      // Phase 4: 19.0s - Completion
       const completeTimer = setTimeout(() => {
         setPhase('complete');
         onComplete();
-      }, 1600);
+      }, 19000);
 
       return () => {
         clearTimeout(hairTimer);
@@ -112,19 +112,19 @@ export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
         if (!themeSwappedRef.current) onThemeSwap();
       };
     } else {
-      // DARK -> LIGHT (Short ~0.8s Sequence)
+      // DARK -> LIGHT (Short ~1.5s Sequence)
       // Phase 1: 0.0s - Collapse aura
       setPhase('charging');
       setHairColor('#FFD54F');
       setIsSuperSaiyan(true);
 
-      // Phase 2: 0.25s - Hair turns black
+      // Phase 2: 0.5s - Hair turns black
       const hairTimer = setTimeout(() => {
         setHairColor('#070707');
         setIsSuperSaiyan(false);
-      }, 250);
+      }, 500);
 
-      // Phase 3: 0.45s - Flash Peak & Theme Swap
+      // Phase 3: 0.8s - Flash Peak & Theme Swap
       const flashTimer = setTimeout(() => {
         setPhase('flash');
         setTimeout(() => {
@@ -133,13 +133,13 @@ export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
             themeSwappedRef.current = true;
           }
         }, 60);
-      }, 450);
+      }, 800);
 
-      // Phase 4: 0.8s - Completion
+      // Phase 4: 1.5s - Completion
       const completeTimer = setTimeout(() => {
         setPhase('complete');
         onComplete();
-      }, 800);
+      }, 1500);
 
       return () => {
         clearTimeout(hairTimer);
@@ -206,51 +206,73 @@ export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
           animate={
             direction === 'light-to-dark' && phase === 'charging'
               ? {
-                  x: [-3, 3, -4, 4, -2, 2, 0],
-                  y: [-2, 2, -3, 3, -1, 1, 0],
+                  x: [-2, 2, -3, 3, -1, 1, 0],
+                  y: [-1, 1, -2, 2, -1, 1, 0],
                 }
               : { x: 0, y: 0 }
           }
           transition={{
             repeat: Infinity,
-            duration: 0.12,
+            duration: 0.25,
             ease: 'linear',
           }}
           className="relative w-full h-full flex items-center justify-center"
         >
-          {/* Ki Aura Ring */}
+          {/* Main Ki Aura */}
           <motion.div
             animate={{
-              scale: isSuperSaiyan ? [1, 1.25, 1.1] : [0.8, 1, 0.9],
-              opacity: phase === 'charging' ? [0.4, 0.9, 0.6] : 0,
+              scale: isSuperSaiyan ? [1, 1.4, 1.2] : [0.8, 1, 0.9],
+              opacity: phase === 'charging' ? [0.6, 1, 0.8] : 0,
             }}
-            transition={{ repeat: Infinity, duration: 0.3 }}
-            className="absolute w-[360px] h-[360px] rounded-full blur-xl pointer-events-none"
+            transition={{ repeat: Infinity, duration: 0.5 }}
+            className="absolute w-[500px] h-[500px] rounded-full blur-2xl pointer-events-none"
             style={{
               background: isSuperSaiyan
-                ? 'radial-gradient(circle, rgba(255,193,7,0.7) 0%, rgba(245,124,0,0.4) 60%, transparent 80%)'
-                : 'radial-gradient(circle, rgba(0,229,255,0.6) 0%, rgba(30,136,229,0.3) 60%, transparent 80%)',
+                ? 'radial-gradient(circle, rgba(255,213,79,0.8) 0%, rgba(245,124,0,0.4) 50%, transparent 70%)'
+                : 'radial-gradient(circle, rgba(0,229,255,0.7) 0%, rgba(30,136,229,0.3) 50%, transparent 70%)',
+            }}
+          />
+          {/* Intense Core Aura */}
+          <motion.div
+            animate={{
+              scale: isSuperSaiyan ? [1.1, 1.5, 1.3] : [0.9, 1.1, 1.0],
+              opacity: phase === 'charging' ? [0.7, 1, 0.8] : 0,
+            }}
+            transition={{ repeat: Infinity, duration: 0.3 }}
+            className="absolute w-[300px] h-[300px] rounded-full blur-xl pointer-events-none"
+            style={{
+              background: isSuperSaiyan
+                ? 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,193,7,0.7) 40%, transparent 80%)'
+                : 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(0,229,255,0.6) 40%, transparent 80%)',
             }}
           />
 
           {/* Electric Shockwaves / Lightning Arcs */}
           {isSuperSaiyan && (
-            <svg className="absolute w-[420px] h-[420px] pointer-events-none" viewBox="0 0 200 200">
+            <svg className="absolute w-[500px] h-[500px] pointer-events-none" viewBox="0 0 200 200">
               <motion.path
-                d="M 40 100 Q 60 70 90 95 T 160 100"
+                d="M 20 100 Q 60 50 100 95 T 180 100"
                 stroke="#00E5FF"
-                strokeWidth="3"
+                strokeWidth="2.5"
                 fill="none"
-                animate={{ opacity: [0, 1, 0, 0.8, 0] }}
-                transition={{ repeat: Infinity, duration: 0.2 }}
+                animate={{ opacity: [0, 0.8, 0, 0.6, 0] }}
+                transition={{ repeat: Infinity, duration: 0.8 }}
               />
               <motion.path
-                d="M 100 30 Q 120 70 95 120 T 100 170"
+                d="M 100 20 Q 130 60 95 120 T 100 180"
                 stroke="#FFD54F"
                 strokeWidth="2.5"
                 fill="none"
-                animate={{ opacity: [0, 0.9, 0, 1, 0] }}
-                transition={{ repeat: Infinity, duration: 0.25, delay: 0.05 }}
+                animate={{ opacity: [0, 0.9, 0, 0.8, 0] }}
+                transition={{ repeat: Infinity, duration: 0.9, delay: 0.3 }}
+              />
+              <motion.path
+                d="M 50 150 Q 80 120 120 160 T 170 140"
+                stroke="#FFFFFF"
+                strokeWidth="2"
+                fill="none"
+                animate={{ opacity: [0, 0.7, 0] }}
+                transition={{ repeat: Infinity, duration: 0.7, delay: 0.5 }}
               />
             </svg>
           )}
@@ -306,7 +328,7 @@ export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
             opacity: phase === 'flash' ? [0, 1, 1, 0] : 0,
           }}
           transition={{
-            duration: 0.45,
+            duration: 1.0,
             times: [0, 0.3, 0.7, 1],
             ease: "easeInOut"
           }}

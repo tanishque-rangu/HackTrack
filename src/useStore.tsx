@@ -138,7 +138,7 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
     // Fetch initial state from DB on load (if returning user)
     const fetchInitialState = async () => {
       try {
-        const { data, error } = await supabase.from('squads').select('state').eq('code', squadInfo.code).single();
+        const { data, error } = await supabase!.from('squads').select('state').eq('code', squadInfo.code).single();
         if (!error && data?.state) {
           setData(data.state);
         }
