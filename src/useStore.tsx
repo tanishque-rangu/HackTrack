@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, useCallback } from 'react';
+import { useState, useEffect, createContext, useContext, useCallback, useRef } from 'react';
 import type { StoreData, Project, Hackathon } from './types';
 import initialData from './data.json';
 import { supabase } from './lib/supabase';
@@ -115,18 +115,13 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [squadInfo]);
 
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+
   // Real-time Supabase Subscription
   useEffect(() => {
     if (!squadInfo?.code) return;
     if (!supabase) return;
 
-    // TODO: Implement deep fetching of data from Postgres and map to StoreData.
-    // For now, we will use a "sync_payloads" fallback or just keep it local-only 
-    // until full SQL mapping is built for the UI.
-    
-    // For Phase 1 completion, we'll simulate the real-time hookup on the main UI
-    // while keeping the exact Context API intact.
-    
     const channel = supabase
       .channel(`squad:${squadInfo.code}`)
       .on('broadcast', { event: 'state_update' }, ({ payload }) => {
@@ -134,6 +129,8 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
         setData(payload.state);
       })
       .subscribe();
+      
+    channelRef.current = channel;
 
     // Fetch initial state from DB on load (if returning user)
     const fetchInitialState = async () => {
@@ -150,17 +147,20 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => {
       supabase?.removeChannel(channel);
+      channelRef.current = null;
     };
   }, [squadInfo?.code]);
 
   const broadcastChange = useCallback(async (newState: StoreData) => {
     if (squadInfo?.code && supabase) {
       // 1. Broadcast to currently online peers
-      supabase.channel(`squad:${squadInfo.code}`).send({
-        type: 'broadcast',
-        event: 'state_update',
-        payload: { state: newState }
-      }).catch(console.error);
+      if (channelRef.current) {
+        channelRef.current.send({
+          type: 'broadcast',
+          event: 'state_update',
+          payload: { state: newState }
+        }).catch(console.error);
+      }
       
       // 2. Persist to database so offline peers get it when they join
       try {
