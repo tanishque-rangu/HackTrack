@@ -140,14 +140,21 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, [squadInfo?.code]);
 
-  // Helper to broadcast changes
-  const broadcastChange = useCallback((newState: StoreData) => {
+  const broadcastChange = useCallback(async (newState: StoreData) => {
     if (squadInfo?.code && supabase) {
+      // 1. Broadcast to currently online peers
       supabase.channel(`squad:${squadInfo.code}`).send({
         type: 'broadcast',
         event: 'state_update',
         payload: { state: newState }
       }).catch(console.error);
+      
+      // 2. Persist to database so offline peers get it when they join
+      try {
+        await supabase.from('squads').update({ state: newState }).eq('code', squadInfo.code);
+      } catch (err) {
+        console.warn("Could not save state to DB. You may need to add the 'state' JSONB column to the squads table.");
+      }
     }
   }, [squadInfo?.code]);
 
@@ -156,8 +163,20 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       if (!supabase) throw new Error("Supabase is disabled");
       
-      // Create or get squad
-      let { data: squad } = await supabase.from('squads').select('id, code').eq('code', code).single();
+      // Create or get squad, trying to fetch the 'state' column
+      let squad;
+      let loadedState = null;
+      
+      const { data: squadWithState, error: stateErr } = await supabase.from('squads').select('id, code, state').eq('code', code).single();
+      
+      if (stateErr && stateErr.code === '42703') {
+        // Fallback if 'state' column doesn't exist yet
+        const { data: squadWithoutState } = await supabase.from('squads').select('id, code').eq('code', code).single();
+        squad = squadWithoutState;
+      } else if (!stateErr) {
+        squad = squadWithState;
+        loadedState = squadWithState.state;
+      }
       
       if (!squad) {
         const { data: newSquad, error } = await supabase.from('squads').insert([{ code, name: code }]).select().single();
@@ -169,8 +188,11 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
       if (squad) {
         await supabase.from('members').insert([{ squad_id: squad.id, display_name: name }]).select().single();
         
-        // If migrate is checked, we would upload `data` to PostgreSQL tables here.
-        // For now, we set the squadInfo to pass the gatekeeper.
+        // If we loaded state from DB, apply it!
+        if (loadedState) {
+           setData(loadedState);
+        }
+        
         setSquadInfo({ code: squad.code, id: squad.id });
         localStorage.setItem('hacktrack-sender', name);
       }
