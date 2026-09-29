@@ -259,7 +259,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-6 mt-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-4">
                     <div className="flex items-center gap-1.5 bg-black/40 p-2 rounded-full border border-borderMuted">
                       {[1, 2, 3, 4, 5, 6, 7].map((num) => (
                         <button 
@@ -284,7 +284,7 @@ export default function Dashboard() {
             </>
           ) : (
             <div className="bg-card border border-borderSubtle shadow-sm rounded-xl p-6 relative z-10 flex flex-col md:flex-row gap-6 md:items-center md:justify-between">
-              <div className="flex items-center gap-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
                 {/* Progress Ring / Stepper for Light Mode */}
                 <div className="w-20 h-20 shrink-0 relative flex items-center justify-center">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
@@ -473,7 +473,7 @@ export default function Dashboard() {
                   <div className="space-y-3 mb-6 flex-grow">
                     {h.registrationDeadline && regStatus && (
                       <div className={`flex flex-col p-3 rounded border ${actualTheme === 'dark' ? 'bg-[#0a0a0a] border-borderSubtle' : 'bg-panelAlt border-borderSubtle'}`}>
-                        <div className="flex justify-between items-center mb-2">
+                        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-2">
                           <div className="flex items-center gap-2">
                             <span className={`text-[10px] font-black uppercase tracking-widest ${actualTheme === 'dark' ? 'text-[var(--text-gray-400)]' : 'text-muted'}`}>Registration</span>
                             <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-sm border ${
@@ -496,7 +496,7 @@ export default function Dashboard() {
                     
                     {h.submissionDeadline && subStatus && (
                       <div className={`flex flex-col p-3 rounded border ${actualTheme === 'dark' ? 'bg-[#0a0a0a] border-borderSubtle' : 'bg-panelAlt border-borderSubtle'}`}>
-                        <div className="flex justify-between items-center mb-2">
+                        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-2">
                           <div className="flex items-center gap-2">
                             <span className={`text-[10px] font-black uppercase tracking-widest ${actualTheme === 'dark' ? 'text-[var(--text-gray-400)]' : 'text-muted'}`}>Submission</span>
                             <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-sm border ${
@@ -649,9 +649,9 @@ export default function Dashboard() {
                       <Target size={16} className={actualTheme === 'light' ? 'text-primary' : ''} /> {copy.missionTimeline}
                     </h4>
                     <div className="space-y-4">
-                      <div className="flex justify-between items-center pb-2">
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 pb-2">
                         <span className={`text-sm font-bold uppercase tracking-wide ${actualTheme === 'dark' ? 'text-[var(--text-gray-400)]' : 'text-muted'}`}>Registration</span>
-                        <div className="text-foreground font-black uppercase text-right flex items-center gap-2">
+                        <div className="text-foreground font-black uppercase text-right flex flex-wrap items-center gap-2">
                           <div className={`text-xs ${actualTheme === 'dark' ? 'text-[var(--text-gray-500)]' : 'text-muted'}`}>{selectedHackathon.registrationDeadline}</div>
                           <div className={`px-2 py-1 rounded tracking-widest ${actualTheme === 'dark' ? 'bg-white/10' : 'bg-panel border border-borderSubtle'}`}><LiveCountdown dateStr={selectedHackathon.registrationDeadline} /></div>
                         </div>
@@ -662,9 +662,9 @@ export default function Dashboard() {
                         deadline={parseISO(selectedHackathon.registrationDeadline).getTime()} 
                         completed={stages[1].state === 'COMPLETED' || stages[1].state === 'COMPLETED_FINAL'} 
                       />
-                      <div className={`flex justify-between items-center border-t pt-4 pb-2 mt-4 ${actualTheme === 'dark' ? 'border-borderSubtle' : 'border-borderMuted'}`}>
+                      <div className={`flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-t pt-4 pb-2 mt-4 ${actualTheme === 'dark' ? 'border-borderSubtle' : 'border-borderMuted'}`}>
                         <span className={`text-sm font-bold uppercase tracking-wide ${actualTheme === 'dark' ? 'text-[var(--text-gray-400)]' : 'text-muted'}`}>Submission</span>
-                        <div className="text-foreground font-black uppercase text-right flex items-center gap-2">
+                        <div className="text-foreground font-black uppercase text-right flex flex-wrap items-center gap-2">
                           <div className={`text-xs ${actualTheme === 'dark' ? 'text-[var(--text-gray-500)]' : 'text-muted'}`}>{selectedHackathon.submissionDeadline || 'N/A'}</div>
                           {selectedHackathon.submissionDeadline && (
                             <div className={`px-2 py-1 rounded tracking-widest ${actualTheme === 'dark' ? 'bg-white/10' : 'bg-panel border border-borderSubtle'}`}><LiveCountdown dateStr={selectedHackathon.submissionDeadline} /></div>
