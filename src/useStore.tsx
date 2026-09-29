@@ -135,6 +135,19 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
       })
       .subscribe();
 
+    // Fetch initial state from DB on load (if returning user)
+    const fetchInitialState = async () => {
+      try {
+        const { data, error } = await supabase.from('squads').select('state').eq('code', squadInfo.code).single();
+        if (!error && data?.state) {
+          setData(data.state);
+        }
+      } catch (e) {
+        // Ignore, fallback to local storage
+      }
+    };
+    fetchInitialState();
+
     return () => {
       supabase?.removeChannel(channel);
     };
