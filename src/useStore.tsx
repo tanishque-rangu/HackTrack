@@ -136,7 +136,7 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase?.removeChannel(channel);
     };
   }, [squadInfo?.code]);
 
