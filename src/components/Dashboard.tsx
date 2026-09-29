@@ -464,7 +464,7 @@ export default function Dashboard() {
                       stages={stages} 
                       activeStageNumber={activeStage?.stageNumber} 
                     />
-                    <div className={actualTheme === 'dark' ? "mt-3 flex justify-between items-center border-t border-borderMuted pt-2" : "mt-4 flex justify-between items-center border-t border-borderSubtle pt-3"}>
+                    <div className={actualTheme === 'dark' ? "mt-3 flex flex-wrap gap-2 justify-between items-center border-t border-borderMuted pt-2" : "mt-4 flex flex-wrap gap-2 justify-between items-center border-t border-borderSubtle pt-3"}>
                       <span className={`text-[10px] font-black uppercase tracking-widest ${actualTheme === 'dark' ? 'text-[var(--text-gray-500)]' : 'text-muted'}`}>CURRENT STAGE</span>
                       <span className={`text-xs font-black uppercase ${actualTheme === 'dark' ? 'text-primaryLight' : 'text-primary'}`}>{activeStage ? copy.stages[activeStage.stageNumber - 1] : 'FINALE'}</span>
                     </div>
@@ -518,7 +518,7 @@ export default function Dashboard() {
                     )}
                   </div>
                   
-                  <div className="pt-4 flex items-center justify-between mt-auto">
+                  <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-2 mt-auto">
                     <div className="flex items-center gap-2">
                       <span className={`text-[9px] font-black uppercase tracking-widest ${actualTheme === 'dark' ? 'text-[var(--text-gray-500)]' : 'text-muted'}`}>{copy.combatUnits}</span>
                       <div className="flex -space-x-1.5">
@@ -535,7 +535,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     
-                    <button className={`relative overflow-hidden flex items-center gap-2 text-xs font-black px-4 py-2.5 rounded-sm transition-all duration-300 ${
+                    <button className={`relative overflow-hidden flex items-center justify-center sm:justify-start w-full sm:w-auto gap-2 text-xs font-black px-4 py-2.5 rounded-sm transition-all duration-300 ${
                       actualTheme === 'dark' 
                         ? (isUrgent 
                           ? 'bg-primary text-[#070707] border border-primaryLight box-glow-orange group-hover:-translate-y-1' 
@@ -679,7 +679,7 @@ export default function Dashboard() {
                           completed={stages[5].state === 'COMPLETED' || stages[5].state === 'COMPLETED_FINAL'} 
                         />
                       )}
-                      <div className="flex justify-between items-center">
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-1">
                         <span className={`text-sm font-bold uppercase tracking-wide ${actualTheme === 'dark' ? 'text-[var(--text-gray-400)]' : 'text-muted'}`}>Event Dates</span>
                         <span className="text-warning font-black uppercase">{selectedHackathon.eventDates}</span>
                       </div>
