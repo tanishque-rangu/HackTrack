@@ -125,7 +125,7 @@ export function KamehamehaTrack({ label, startTime, deadline, completed, compact
               {/* The Beam */}
               {phase !== 'CHARGING' && (
                 <motion.div
-                  className="absolute top-0 left-0 bottom-0 origin-left"
+                  className="absolute top-0 left-0 bottom-0 origin-left w-full"
                   style={{ backgroundColor: color, boxShadow: prefersReducedMotion ? 'none' : glow }}
                   initial={{ scaleX: progress }}
                   animate={{ scaleX: progress }}
