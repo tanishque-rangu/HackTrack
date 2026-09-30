@@ -56,6 +56,18 @@ export const playThemeAudio = (type: 'power-up' | 'power-down', enabled: boolean
     currentAudio.play().catch((e) => {
       console.warn('[Audio] Playback failed:', e);
     });
+
+    // Preload and unlock the background loop audio immediately on click
+    bgAudio = new Audio('/ssj2_aura.mp3');
+    bgAudio.volume = 0.2;
+    bgAudio.loop = true;
+    bgAudio.preload = 'auto';
+    bgAudio.play().then(() => {
+      if (bgAudio) {
+        bgAudio.pause();
+        bgAudio.currentTime = 0;
+      }
+    }).catch((e) => console.warn('[Audio] Background preload failed:', e));
   } catch (e) {
     console.warn('[Audio] Setup failed:', e);
   }
