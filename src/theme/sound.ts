@@ -59,11 +59,11 @@ export const playThemeAudio = (type: 'power-up' | 'power-down', enabled: boolean
 
     // Preload and unlock the background loop audio immediately on click
     bgAudio = new Audio('/ssj2_aura.mp3');
-    bgAudio.volume = 0.2;
+    bgAudio.volume = 0; // Mute during the split-second unlock play
     bgAudio.loop = true;
     bgAudio.preload = 'auto';
     bgAudio.play().then(() => {
-      if (bgAudio) {
+      if (bgAudio && bgAudio.volume === 0) {
         bgAudio.pause();
         bgAudio.currentTime = 0;
       }
@@ -85,9 +85,10 @@ export const stopThemeAudio = (startChargingLoop: boolean = false) => {
     try {
       if (!bgAudio) {
         bgAudio = new Audio('/ssj2_aura.mp3');
-        bgAudio.volume = 0.2;
         bgAudio.loop = true;
       }
+      bgAudio.volume = 0.2;
+      bgAudio.currentTime = 0; // Guarantee it plays from the start (the burst)
       bgAudio.play().catch(e => console.warn(e));
     } catch (e) {
       console.warn(e);
