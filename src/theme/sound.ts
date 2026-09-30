@@ -1,8 +1,29 @@
 let currentAudio: HTMLAudioElement | null = null;
 let bgAudio: HTMLAudioElement | null = null;
+let isSoundEnabled: boolean = true;
+
+export const syncSoundEnabled = (enabled: boolean) => {
+  isSoundEnabled = enabled;
+  if (!enabled) {
+    if (currentAudio) {
+      currentAudio.pause();
+    }
+    if (bgAudio) {
+      bgAudio.pause();
+    }
+  } else {
+    // Optionally resume bgAudio if we are currently in dark mode?
+    // But since we don't know the mode here, we'll just wait for the next transition.
+    // Or we could try to play if bgAudio is present.
+    if (bgAudio) {
+      bgAudio.play().catch(e => console.warn(e));
+    }
+  }
+};
 
 export const playThemeAudio = (type: 'power-up' | 'power-down', enabled: boolean = true) => {
-  if (!enabled || typeof window === 'undefined') return;
+  isSoundEnabled = enabled;
+  if (!isSoundEnabled || typeof window === 'undefined') return;
 
   if (currentAudio) {
     currentAudio.pause();
@@ -48,9 +69,10 @@ export const stopThemeAudio = (startChargingLoop: boolean = false) => {
   }
   
   if (startChargingLoop && typeof window !== 'undefined') {
+    if (!isSoundEnabled) return;
     try {
       if (!bgAudio) {
-        bgAudio = new Audio('/charged.mpeg');
+        bgAudio = new Audio('/ssj2_aura.mp3');
         bgAudio.volume = 0.2;
         bgAudio.loop = true;
       }

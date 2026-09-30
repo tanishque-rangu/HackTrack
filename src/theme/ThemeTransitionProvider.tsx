@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import type { ReactNode } from 'react';
 import { useTheme } from './ThemeProvider';
 import { ThemeTransitionOverlay } from './ThemeTransitionOverlay';
-import { playThemeAudio, stopThemeAudio } from './sound';
+import { playThemeAudio, stopThemeAudio, syncSoundEnabled } from './sound';
 
 interface ThemeTransitionContextType {
   changeTheme: (next: 'dark' | 'light' | 'system', originRect?: DOMRect | null) => void;
@@ -43,7 +43,12 @@ export const ThemeTransitionProvider: React.FC<{ children: ReactNode }> = ({ chi
   const setSoundEnabled = useCallback((val: boolean) => {
     localStorage.setItem('hacktrack-sound-enabled', String(val));
     setSoundEnabledState(val);
+    syncSoundEnabled(val);
   }, []);
+
+  useEffect(() => {
+    syncSoundEnabled(soundEnabled);
+  }, [soundEnabled]);
 
   // System prefers-reduced-motion check
   const systemPrefersReducedMotion = useMemo(() => {
