@@ -82,6 +82,10 @@ export const stopThemeAudio = (startChargingLoop: boolean = false) => {
   
   if (startChargingLoop && typeof window !== 'undefined') {
     if (!isSoundEnabled) return;
+    // If already playing seamlessly, do not restart
+    if (bgAudio && !bgAudio.paused && bgAudio.currentTime > 0) {
+      return;
+    }
     try {
       if (!bgAudio) {
         bgAudio = new Audio('/ssj2_aura.mp3');

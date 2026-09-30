@@ -125,6 +125,9 @@ export const ThemeTransitionProvider: React.FC<{ children: ReactNode }> = ({ chi
     setTheme(nextTheme);
     const label = nextTheme === 'dark' ? 'Dark mode on' : 'Light mode on';
     setAnnouncement(label);
+    if (nextTheme === 'dark') {
+      stopThemeAudio(true);
+    }
   }, [nextTheme, setTheme]);
 
   const handleComplete = useCallback(() => {
