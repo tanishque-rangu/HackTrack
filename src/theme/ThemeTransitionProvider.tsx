@@ -107,7 +107,7 @@ export const ThemeTransitionProvider: React.FC<{ children: ReactNode }> = ({ chi
         // Tab hidden mid-animation -> swap immediately & finish
         setTheme(nextTheme);
         setIsPlaying(false);
-        stopThemeAudio();
+        stopThemeAudio(nextTheme === 'dark');
         setAnnouncement(nextTheme === 'dark' ? 'Dark mode on' : 'Light mode on');
       }
     };
@@ -124,8 +124,8 @@ export const ThemeTransitionProvider: React.FC<{ children: ReactNode }> = ({ chi
 
   const handleComplete = useCallback(() => {
     setIsPlaying(false);
-    stopThemeAudio();
-  }, []);
+    stopThemeAudio(nextTheme === 'dark');
+  }, [nextTheme]);
 
 
 

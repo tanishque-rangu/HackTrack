@@ -121,19 +121,19 @@ export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
         if (!themeSwappedRef.current) onThemeSwap();
       };
     } else {
-      // DARK -> LIGHT (Short ~1.5s Sequence)
+      // DARK -> LIGHT (Short 0.4s Sequence)
       // Phase 1: 0.0s - Collapse aura
       setPhase('charging');
       setHairColor('#FFD54F');
       setIsSuperSaiyan(true);
 
-      // Phase 2: 0.5s - Hair turns black
+      // Phase 2: 0.1s - Hair turns black
       const hairTimer = setTimeout(() => {
         setHairColor('#070707');
         setIsSuperSaiyan(false);
-      }, 500);
+      }, 100);
 
-      // Phase 3: 0.8s - Flash Peak & Theme Swap
+      // Phase 3: 0.2s - Flash Peak & Theme Swap
       const flashTimer = setTimeout(() => {
         setPhase('flash');
         setTimeout(() => {
@@ -141,14 +141,14 @@ export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
             onThemeSwap();
             themeSwappedRef.current = true;
           }
-        }, 60);
-      }, 800);
+        }, 30);
+      }, 200);
 
-      // Phase 4: 1.5s - Completion
+      // Phase 4: 0.4s - Completion
       const completeTimer = setTimeout(() => {
         setPhase('complete');
         onComplete();
-      }, 1500);
+      }, 400);
 
       return () => {
         clearTimeout(hairTimer);
