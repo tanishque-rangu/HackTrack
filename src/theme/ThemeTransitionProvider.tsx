@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import type { ReactNode } from 'react';
 import { useTheme } from './ThemeProvider';
 import { ThemeTransitionOverlay } from './ThemeTransitionOverlay';
-import { playThemeAudio } from './sound';
+import { playThemeAudio, stopThemeAudio } from './sound';
 
 interface ThemeTransitionContextType {
   changeTheme: (next: 'dark' | 'light' | 'system', originRect?: DOMRect | null) => void;
@@ -107,6 +107,7 @@ export const ThemeTransitionProvider: React.FC<{ children: ReactNode }> = ({ chi
         // Tab hidden mid-animation -> swap immediately & finish
         setTheme(nextTheme);
         setIsPlaying(false);
+        stopThemeAudio();
         setAnnouncement(nextTheme === 'dark' ? 'Dark mode on' : 'Light mode on');
       }
     };
@@ -123,12 +124,14 @@ export const ThemeTransitionProvider: React.FC<{ children: ReactNode }> = ({ chi
 
   const handleComplete = useCallback(() => {
     setIsPlaying(false);
+    stopThemeAudio();
   }, []);
 
   const handleSkip = useCallback(() => {
     setTheme(nextTheme);
     setAnnouncement(nextTheme === 'dark' ? 'Dark mode on' : 'Light mode on');
     setIsPlaying(false);
+    stopThemeAudio();
   }, [nextTheme, setTheme]);
 
   return (

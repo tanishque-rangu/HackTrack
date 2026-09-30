@@ -49,6 +49,7 @@ interface StoreContextType {
   updateProject: (hackathonId: string, team: string, projectUpdates: Partial<Project>) => void;
   addChatMessage: (hackathonId: string, sender: string, text: string) => void;
   updatePowerHistory: (power: number) => void;
+  addHackathon: (hackathon: Hackathon) => void;
 }
 
 const StoreContext = createContext<StoreContextType | null>(null);
@@ -319,8 +320,27 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
     });
   }, [broadcastChange]);
 
+  const addHackathon = (hackathon: Hackathon) => {
+    setData(prev => {
+      const newState = { ...prev, hackathons: [...prev.hackathons, hackathon] };
+      if (!newState.chats) newState.chats = {};
+      if (!newState.chats[hackathon.id]) newState.chats[hackathon.id] = [];
+      if (!newState.registrationStatus) newState.registrationStatus = {};
+      if (!newState.registrationStatus[hackathon.id]) newState.registrationStatus[hackathon.id] = {};
+      if (!newState.checklistState) newState.checklistState = {};
+      if (!newState.checklistState[hackathon.id]) {
+        newState.checklistState[hackathon.id] = {};
+        (newState.submissionChecklist || []).forEach(item => {
+          newState.checklistState![hackathon.id][item] = { done: false };
+        });
+      }
+      broadcastChange(newState);
+      return newState;
+    });
+  };
+
   return (
-    <StoreContext.Provider value={{ data, squadInfo, handleJoinSquad, updateRegistrationStatus, updateChecklistItem, updateProject, addChatMessage, updatePowerHistory }}>
+    <StoreContext.Provider value={{ data, squadInfo, handleJoinSquad, updateRegistrationStatus, updateChecklistItem, updateProject, addChatMessage, updatePowerHistory, addHackathon }}>
       {children}
     </StoreContext.Provider>
   );

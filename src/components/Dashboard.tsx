@@ -18,7 +18,7 @@ import { getCopy } from '../copy';
 export default function Dashboard() {
   const { actualTheme } = useTheme();
   const copy = getCopy(actualTheme);
-  const { data, addChatMessage, updateRegistrationStatus, updatePowerHistory, updateChecklistItem, updateProject } = useStore();
+  const { data, addChatMessage, updateRegistrationStatus, updatePowerHistory, updateChecklistItem, updateProject, addHackathon } = useStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [chatInput, setChatInput] = useState('');
   const [senderName, setSenderName] = useState(() => localStorage.getItem('hacktrack-sender') || data.members[0]);
@@ -372,6 +372,32 @@ export default function Dashboard() {
               </div>
             </div>
           )}
+        </div>
+
+        <div className="flex justify-between items-end mb-4 relative z-10">
+          <div></div>
+          <button 
+            onClick={() => {
+              const name = window.prompt('Enter Hackathon Name:');
+              if (!name) return;
+              const platform = window.prompt('Enter Platform (e.g. Devfolio, Devpost, Custom):') || 'Custom';
+              const newHackathon = {
+                id: name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+                name,
+                platform,
+                format: 'Online',
+                registrationDeadline: new Date().toISOString().split('T')[0],
+                submissionDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                eventDates: 'TBD',
+                teams: [{ teamLabel: 'Team A', members: [] }],
+                projects: []
+              };
+              addHackathon(newHackathon);
+            }}
+            className={`px-4 py-2 font-bold text-xs uppercase tracking-wider rounded transition-colors ${actualTheme === 'dark' ? 'bg-primary/20 text-primary border border-primary/40 hover:bg-primary/30' : 'bg-primary text-primaryForeground hover:bg-primary/90'}`}
+          >
+            + ADD NEW HACKATHON
+          </button>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 relative z-10">
@@ -805,6 +831,18 @@ export default function Dashboard() {
                                     <span className={`font-bold text-sm uppercase ${actualTheme === 'dark' ? 'text-gray-200' : 'text-foreground'}`}>
                                       {project?.projectName || 'NO PROJECT ASSIGNED'}
                                     </span>
+                                    <button 
+                                      onClick={() => {
+                                        const val = window.prompt('Enter Project Name:', project?.projectName || '');
+                                        if (val !== null && val.trim() !== '') {
+                                          updateProject(selectedHackathon.id, team.teamLabel, { projectName: val });
+                                        }
+                                      }}
+                                      className={`ml-2 px-2 py-1 text-[10px] font-black uppercase rounded border transition-colors ${actualTheme === 'dark' ? 'bg-background border-borderMuted hover:border-primary text-[var(--text-gray-400)]' : 'bg-card border-borderSubtle hover:border-primary text-muted'}`}
+                                      title="Edit Project Name"
+                                    >
+                                      EDIT
+                                    </button>
                                   </div>
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">

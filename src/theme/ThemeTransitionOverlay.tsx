@@ -28,19 +28,34 @@ export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
   const [isSuperSaiyan, setIsSuperSaiyan] = useState<boolean>(direction === 'dark-to-light');
   const themeSwappedRef = useRef(false);
 
-  // Keyboard escape listener to skip
+  // Lock interaction strictly during the transition
   useEffect(() => {
     if (!isPlaying) return;
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onSkip();
-      }
+    // Blur current active element so typing doesn't affect inputs
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    const stopEvent = (e: Event) => {
+      e.stopPropagation();
+      e.preventDefault();
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPlaying, onSkip]);
+    window.addEventListener('keydown', stopEvent, { capture: true });
+    window.addEventListener('keyup', stopEvent, { capture: true });
+    window.addEventListener('keypress', stopEvent, { capture: true });
+    window.addEventListener('click', stopEvent, { capture: true });
+    window.addEventListener('mousedown', stopEvent, { capture: true });
+    
+    return () => {
+      window.removeEventListener('keydown', stopEvent, { capture: true });
+      window.removeEventListener('keyup', stopEvent, { capture: true });
+      window.removeEventListener('keypress', stopEvent, { capture: true });
+      window.removeEventListener('click', stopEvent, { capture: true });
+      window.removeEventListener('mousedown', stopEvent, { capture: true });
+    };
+  }, [isPlaying]);
 
   // Main animation sequence controller
   useEffect(() => {
@@ -71,19 +86,19 @@ export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
     }
 
     if (direction === 'light-to-dark') {
-      // LIGHT -> DARK (Full ~19.0s Sequence)
+      // LIGHT -> DARK (Full 9.0s Sequence)
       // Phase 1: 0.0s - Vignette & Goku Silhouette
       setPhase('charging');
       setHairColor('#070707');
       setIsSuperSaiyan(false);
 
-      // Phase 2: 10.0s - Hair turns gold & aura burst
+      // Phase 2: 4.5s - Hair turns gold & aura burst
       const hairTimer = setTimeout(() => {
         setHairColor('#FFD54F');
         setIsSuperSaiyan(true);
-      }, 10000);
+      }, 4500);
 
-      // Phase 3: 18.0s - Smooth Flash Peak & Theme Swap
+      // Phase 3: 8.0s - Smooth Flash Peak & Theme Swap
       const flashTimer = setTimeout(() => {
         setPhase('flash');
         // Swap theme after flash starts reaching full opacity
@@ -93,13 +108,13 @@ export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
             themeSwappedRef.current = true;
           }
         }, 80);
-      }, 18000);
+      }, 8000);
 
-      // Phase 4: 19.0s - Completion
+      // Phase 4: 9.0s - Completion
       const completeTimer = setTimeout(() => {
         setPhase('complete');
         onComplete();
-      }, 19000);
+      }, 9000);
 
       return () => {
         clearTimeout(hairTimer);
@@ -184,7 +199,6 @@ export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.15 }}
-        onClick={onSkip}
         className="fixed inset-0 z-[9999] pointer-events-auto select-none overflow-hidden"
         aria-hidden="true"
         role="presentation"
