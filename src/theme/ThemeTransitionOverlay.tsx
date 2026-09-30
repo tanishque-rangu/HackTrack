@@ -10,7 +10,6 @@ interface ThemeTransitionOverlayProps {
   soundEnabled: boolean;
   onThemeSwap: () => void;
   onComplete: () => void;
-  onSkip: () => void;
 }
 
 export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
@@ -21,7 +20,6 @@ export const ThemeTransitionOverlay: React.FC<ThemeTransitionOverlayProps> = ({
   soundEnabled,
   onThemeSwap,
   onComplete,
-  onSkip,
 }) => {
   const [phase, setPhase] = useState<'idle' | 'charging' | 'flash' | 'complete'>('idle');
   const [hairColor, setHairColor] = useState<string>(direction === 'light-to-dark' ? '#070707' : '#FFD54F');

@@ -116,7 +116,7 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [squadInfo]);
 
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const channelRef = useRef<ReturnType<NonNullable<typeof supabase>['channel']> | null>(null);
 
   // Real-time Supabase Subscription
   useEffect(() => {

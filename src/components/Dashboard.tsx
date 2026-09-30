@@ -389,6 +389,8 @@ export default function Dashboard() {
                 registrationDeadline: new Date().toISOString().split('T')[0],
                 submissionDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
                 eventDates: 'TBD',
+                registrationLink: '',
+                submissionLink: '',
                 teams: [{ teamLabel: 'Team A', members: [] }],
                 projects: []
               };

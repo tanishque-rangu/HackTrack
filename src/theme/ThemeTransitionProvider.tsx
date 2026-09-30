@@ -155,7 +155,6 @@ export const ThemeTransitionProvider: React.FC<{ children: ReactNode }> = ({ chi
         soundEnabled={soundEnabled}
         onThemeSwap={handleThemeSwap}
         onComplete={handleComplete}
-        onSkip={handleSkip}
       />
 
       {/* ARIA Live Region for screen reader announcements */}
