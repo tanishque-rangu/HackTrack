@@ -127,12 +127,7 @@ export const ThemeTransitionProvider: React.FC<{ children: ReactNode }> = ({ chi
     stopThemeAudio();
   }, []);
 
-  const handleSkip = useCallback(() => {
-    setTheme(nextTheme);
-    setAnnouncement(nextTheme === 'dark' ? 'Dark mode on' : 'Light mode on');
-    setIsPlaying(false);
-    stopThemeAudio();
-  }, [nextTheme, setTheme]);
+
 
   return (
     <ThemeTransitionContext.Provider
