@@ -95,17 +95,17 @@ export function MissionEditor({ hackathonId, onClose }: Props) {
     }, currentUserId);
   };
 
-  const inputClass = `w-full p-3 rounded-md text-sm border focus:outline-none focus:ring-2 transition-all ${
+  const inputClass = `w-full p-3.5 rounded-lg text-sm border focus:outline-none focus:ring-2 transition-all duration-300 ${
     actualTheme === 'dark' 
-      ? 'bg-black/50 border-borderMuted text-white focus:border-primary focus:ring-primary/20' 
-      : 'bg-white border-borderSubtle text-foreground focus:border-primary focus:ring-primary/20'
+      ? 'bg-white/5 border-primary/20 text-white placeholder:text-gray-600 focus:border-primary focus:bg-white/10 focus:ring-primary/30 shadow-inner' 
+      : 'bg-white border-borderSubtle text-foreground focus:border-primary focus:ring-primary/20 shadow-sm'
   }`;
   
-  const labelClass = `block text-[10px] font-black uppercase tracking-widest mb-1.5 ${actualTheme === 'dark' ? 'text-[var(--text-gray-400)]' : 'text-muted'}`;
+  const labelClass = `block text-[11px] font-black uppercase tracking-widest mb-2 ${actualTheme === 'dark' ? 'text-primaryLight drop-shadow-[0_0_8px_rgba(255,167,38,0.4)]' : 'text-muted'}`;
 
   return (
-    <div className={`w-full flex flex-col h-full ${actualTheme === 'dark' ? 'text-gray-200' : 'text-foreground'}`}>
-      <div className="flex justify-between items-center mb-6 pb-4 border-b border-borderSubtle">
+    <div className={`w-full flex flex-col h-full p-4 md:p-6 ${actualTheme === 'dark' ? 'text-gray-200' : 'text-foreground'}`}>
+      <div className="flex justify-between items-center mb-6 pb-4 border-b border-borderSubtle shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center bg-primary text-black font-black text-xl shadow-[0_0_15px_rgba(245,124,0,0.5)]">
             悟
@@ -129,10 +129,10 @@ export function MissionEditor({ hackathonId, onClose }: Props) {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-8 custom-scrollbar pr-2 pb-10">
+      <div className="flex-1 min-h-0 overflow-y-auto space-y-8 custom-scrollbar pr-4 pb-10 mt-2">
         
         {hackathonId && (
-          <div className={`p-4 rounded border flex justify-between items-center ${actualTheme === 'dark' ? 'bg-black/30 border-borderSubtle' : 'bg-panelAlt border-borderSubtle'}`}>
+          <div className={`p-5 rounded-xl border flex justify-between items-center shadow-sm ${actualTheme === 'dark' ? 'bg-gradient-to-r from-black/40 to-black/10 border-primary/20 backdrop-blur-md' : 'bg-panelAlt border-borderSubtle'}`}>
             <div className="flex items-center gap-3">
               <CheckCircle2 className={formData.verifiedAt ? "text-success" : "text-warning"} size={20} />
               <div>
@@ -151,8 +151,10 @@ export function MissionEditor({ hackathonId, onClose }: Props) {
           </div>
         )}
 
-        <section>
-          <h3 className="text-sm font-black uppercase tracking-widest text-primary mb-4 border-b border-primary/20 pb-2">Basic Information</h3>
+        <section className={`p-6 rounded-xl border ${actualTheme === 'dark' ? 'bg-[#0f0a05] border-primary/20 shadow-[0_0_20px_rgba(245,124,0,0.05)]' : 'bg-card border-borderSubtle'}`}>
+          <h3 className="text-sm font-black uppercase tracking-widest text-primary mb-5 flex items-center gap-2">
+            <div className="w-1.5 h-4 bg-primary rounded-full"></div> Basic Information
+          </h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Hackathon Name</label>
@@ -185,8 +187,10 @@ export function MissionEditor({ hackathonId, onClose }: Props) {
           </div>
         </section>
 
-        <section>
-          <h3 className="text-sm font-black uppercase tracking-widest text-primary mb-4 border-b border-primary/20 pb-2">Timeline & Deadlines</h3>
+        <section className={`p-6 rounded-xl border ${actualTheme === 'dark' ? 'bg-[#0f0a05] border-primary/20 shadow-[0_0_20px_rgba(245,124,0,0.05)]' : 'bg-card border-borderSubtle'}`}>
+          <h3 className="text-sm font-black uppercase tracking-widest text-primary mb-5 flex items-center gap-2">
+            <div className="w-1.5 h-4 bg-primary rounded-full"></div> Timeline & Deadlines
+          </h3>
           <div className="grid md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className={labelClass}>Registration Deadline</label>
@@ -238,9 +242,11 @@ export function MissionEditor({ hackathonId, onClose }: Props) {
         </section>
 
         {hackathonId && (
-          <section>
-            <div className="flex justify-between items-center mb-4 border-b border-primary/20 pb-2">
-              <h3 className="text-sm font-black uppercase tracking-widest text-primary">Problem Statements</h3>
+          <section className={`p-6 rounded-xl border ${actualTheme === 'dark' ? 'bg-[#0f0a05] border-primary/20 shadow-[0_0_20px_rgba(245,124,0,0.05)]' : 'bg-card border-borderSubtle'}`}>
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-sm font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                <div className="w-1.5 h-4 bg-primary rounded-full"></div> Problem Statements
+              </h3>
               <button onClick={addProblem} className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-1 hover:underline">
                 <Plus size={12} /> Add Problem
               </button>
@@ -301,8 +307,10 @@ export function MissionEditor({ hackathonId, onClose }: Props) {
           </div>
         </section>
 
-        <section>
-          <h3 className="text-sm font-black uppercase tracking-widest text-primary mb-4 border-b border-primary/20 pb-2">Important Links</h3>
+        <section className={`p-6 rounded-xl border ${actualTheme === 'dark' ? 'bg-[#0f0a05] border-primary/20 shadow-[0_0_20px_rgba(245,124,0,0.05)]' : 'bg-card border-borderSubtle'}`}>
+          <h3 className="text-sm font-black uppercase tracking-widest text-primary mb-5 flex items-center gap-2">
+            <div className="w-1.5 h-4 bg-primary rounded-full"></div> Important Links
+          </h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Registration URL</label>
@@ -324,9 +332,11 @@ export function MissionEditor({ hackathonId, onClose }: Props) {
         </section>
 
         {hackathonId && (
-          <section>
-            <div className="flex justify-between items-center mb-4 border-b border-primary/20 pb-2">
-              <h3 className="text-sm font-black uppercase tracking-widest text-primary">Combat Units (Teams)</h3>
+          <section className={`p-6 rounded-xl border ${actualTheme === 'dark' ? 'bg-[#0f0a05] border-primary/20 shadow-[0_0_20px_rgba(245,124,0,0.05)]' : 'bg-card border-borderSubtle'}`}>
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-sm font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                <div className="w-1.5 h-4 bg-primary rounded-full"></div> Combat Units (Teams)
+              </h3>
               <button 
                 onClick={() => setFormData(prev => ({ ...prev, teams: [...(prev.teams || []), { teamLabel: `Team ${String.fromCharCode(65 + (prev.teams?.length || 0))}`, members: [] }] }))} 
                 className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-1 hover:underline"
@@ -381,9 +391,11 @@ export function MissionEditor({ hackathonId, onClose }: Props) {
         )}
 
         {hackathonId && (
-          <section>
-            <div className="flex justify-between items-center mb-4 border-b border-primary/20 pb-2">
-              <h3 className="text-sm font-black uppercase tracking-widest text-primary">Projects & Submissions</h3>
+          <section className={`p-6 rounded-xl border ${actualTheme === 'dark' ? 'bg-[#0f0a05] border-primary/20 shadow-[0_0_20px_rgba(245,124,0,0.05)]' : 'bg-card border-borderSubtle'}`}>
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-sm font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                <div className="w-1.5 h-4 bg-primary rounded-full"></div> Projects & Submissions
+              </h3>
               <button 
                 onClick={() => setFormData(prev => ({ 
                   ...prev, 
