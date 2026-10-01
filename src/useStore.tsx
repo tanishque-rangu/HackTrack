@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext, useCallback, useRef } from 'react';
-import type { StoreData, Project, Hackathon } from './types';
+import type { StoreData, Project, Hackathon, TimelineEvent, ProblemStatement, ActivityLog, Role } from './types';
 import initialData from './data.json';
 import { supabase } from './lib/supabase';
 
@@ -9,6 +9,10 @@ const initStore = (): StoreData => {
   if (!data.chats) data.chats = {};
   if (!data.registrationStatus) data.registrationStatus = {};
   if (!data.checklistState) data.checklistState = {};
+  if (!data.timelineEvents) data.timelineEvents = [];
+  if (!data.problemStatements) data.problemStatements = [];
+  if (!data.activityLogs) data.activityLogs = [];
+  if (!data.roles) data.roles = {};
   
   data.hackathons.forEach(h => {
     if (!data.registrationStatus[h.id]) data.registrationStatus[h.id] = {};
@@ -50,6 +54,14 @@ interface StoreContextType {
   addChatMessage: (hackathonId: string, sender: string, text: string) => void;
   updatePowerHistory: (power: number) => void;
   addHackathon: (hackathon: Hackathon) => void;
+  updateHackathon: (id: string, updates: Partial<Hackathon>, userId: string) => void;
+  deleteHackathon: (id: string, userId: string) => void;
+  addTimelineEvent: (event: TimelineEvent, userId: string) => void;
+  updateTimelineEvent: (id: string, updates: Partial<TimelineEvent>, userId: string) => void;
+  addProblemStatement: (statement: ProblemStatement, userId: string) => void;
+  updateProblemStatement: (id: string, updates: Partial<ProblemStatement>, userId: string) => void;
+  verifyHackathon: (id: string, userId: string) => void;
+  updateRole: (member: string, role: Role) => void;
 }
 
 const StoreContext = createContext<StoreContextType | null>(null);
@@ -76,14 +88,26 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
         if (!parsed.checklistState) parsed.checklistState = {};
         if (!parsed.submissionChecklist) parsed.submissionChecklist = initialData.submissionChecklist || [];
         
+        if (!parsed.timelineEvents) parsed.timelineEvents = [];
+        if (!parsed.problemStatements) parsed.problemStatements = [];
+        if (!parsed.activityLogs) parsed.activityLogs = [];
+        if (!parsed.roles) parsed.roles = {};
+        
         // Merge fresh hackathon static data (links/notes) while preserving dynamic project states
-        parsed.hackathons = initialData.hackathons.map((initialHackathon: any) => {
-          const storedHackathon = parsed.hackathons?.find((h: Hackathon) => h.id === initialHackathon.id);
-          return {
-            ...initialHackathon,
-            projects: storedHackathon?.projects || initialHackathon.projects || []
-          };
-        });
+        const initialIds = initialData.hackathons.map((h: any) => h.id);
+        const userAddedHackathons = (parsed.hackathons || []).filter((h: Hackathon) => !initialIds.includes(h.id));
+
+        parsed.hackathons = [
+          ...initialData.hackathons.map((initialHackathon: any) => {
+            const storedHackathon = parsed.hackathons?.find((h: Hackathon) => h.id === initialHackathon.id);
+            return {
+              ...initialHackathon,
+              ...(storedHackathon || {}), // preserve edits
+              projects: storedHackathon?.projects || initialHackathon.projects || []
+            };
+          }),
+          ...userAddedHackathons
+        ];
 
         parsed.hackathons?.forEach((h: Hackathon) => {
           if (!parsed.chats[h.id]) parsed.chats[h.id] = [];
@@ -334,13 +358,241 @@ export const StoreProvider = ({ children }: { children: React.ReactNode }) => {
           newState.checklistState![hackathon.id][item] = { done: false };
         });
       }
+      
+      // Log creation
+      const log: ActivityLog = {
+        id: Math.random().toString(36).substr(2, 9),
+        userId: localStorage.getItem('hacktrack-sender') || 'Unknown',
+        hackathonId: hackathon.id,
+        action: 'CREATED',
+        entityType: 'HACKATHON',
+        entityId: hackathon.id,
+        timestamp: new Date().toISOString()
+      };
+      newState.activityLogs = [...(newState.activityLogs || []), log];
+      
+      broadcastChange(newState);
+      return newState;
+    });
+  };
+
+  const updateHackathon = (id: string, updates: Partial<Hackathon>, userId: string) => {
+    setData(prev => {
+      const hackathons = [...prev.hackathons];
+      const index = hackathons.findIndex(h => h.id === id);
+      if (index === -1) return prev;
+      
+      const oldH = hackathons[index];
+      hackathons[index] = { ...oldH, ...updates };
+      
+      const logs = [...(prev.activityLogs || [])];
+      
+      // Log changes
+      Object.keys(updates).forEach(key => {
+        const k = key as keyof Hackathon;
+        if (oldH[k] !== updates[k] && k !== 'verifiedAt' && k !== 'verifiedBy') {
+          logs.push({
+            id: Math.random().toString(36).substr(2, 9),
+            userId,
+            hackathonId: id,
+            action: updates.archivedAt ? 'ARCHIVED' : (oldH.archivedAt && !updates.archivedAt) ? 'RESTORED' : 'UPDATED',
+            entityType: 'HACKATHON',
+            entityId: id,
+            field: k,
+            oldValue: oldH[k] ? String(oldH[k]) : undefined,
+            newValue: updates[k] ? String(updates[k]) : undefined,
+            timestamp: new Date().toISOString()
+          });
+        }
+      });
+      
+      const newState = { ...prev, hackathons, activityLogs: logs };
+      broadcastChange(newState);
+      return newState;
+    });
+  };
+
+  const addTimelineEvent = (event: TimelineEvent, userId: string) => {
+    setData(prev => {
+      const logs = [...(prev.activityLogs || []), {
+        id: Math.random().toString(36).substr(2, 9),
+        userId,
+        hackathonId: event.hackathonId,
+        action: 'CREATED' as const,
+        entityType: 'TIMELINE' as const,
+        entityId: event.id,
+        field: 'Title',
+        newValue: event.title,
+        timestamp: new Date().toISOString()
+      }];
+      const newState = { ...prev, timelineEvents: [...(prev.timelineEvents || []), event], activityLogs: logs };
+      broadcastChange(newState);
+      return newState;
+    });
+  };
+
+  const updateTimelineEvent = (id: string, updates: Partial<TimelineEvent>, userId: string) => {
+    setData(prev => {
+      const events = [...(prev.timelineEvents || [])];
+      const index = events.findIndex(e => e.id === id);
+      if (index === -1) return prev;
+      
+      const oldE = events[index];
+      events[index] = { ...oldE, ...updates };
+      
+      const logs = [...(prev.activityLogs || [])];
+      if (updates.archivedAt && !oldE.archivedAt) {
+        logs.push({
+          id: Math.random().toString(36).substr(2, 9),
+          userId,
+          hackathonId: oldE.hackathonId,
+          action: 'ARCHIVED',
+          entityType: 'TIMELINE',
+          entityId: id,
+          field: 'Title',
+          oldValue: oldE.title,
+          timestamp: new Date().toISOString()
+        });
+      } else if (!updates.archivedAt && oldE.archivedAt) {
+         logs.push({
+          id: Math.random().toString(36).substr(2, 9),
+          userId,
+          hackathonId: oldE.hackathonId,
+          action: 'RESTORED',
+          entityType: 'TIMELINE',
+          entityId: id,
+          field: 'Title',
+          oldValue: oldE.title,
+          timestamp: new Date().toISOString()
+        });
+      } else {
+         // simple update log
+         logs.push({
+          id: Math.random().toString(36).substr(2, 9),
+          userId,
+          hackathonId: oldE.hackathonId,
+          action: 'UPDATED',
+          entityType: 'TIMELINE',
+          entityId: id,
+          field: 'Title',
+          oldValue: oldE.title,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+      const newState = { ...prev, timelineEvents: events, activityLogs: logs };
+      broadcastChange(newState);
+      return newState;
+    });
+  };
+
+  const addProblemStatement = (statement: ProblemStatement, userId: string) => {
+    setData(prev => {
+      const logs = [...(prev.activityLogs || []), {
+        id: Math.random().toString(36).substr(2, 9),
+        userId,
+        hackathonId: statement.hackathonId,
+        action: 'CREATED' as const,
+        entityType: 'PROBLEM_STATEMENT' as const,
+        entityId: statement.id,
+        field: 'Title',
+        newValue: statement.title,
+        timestamp: new Date().toISOString()
+      }];
+      const newState = { ...prev, problemStatements: [...(prev.problemStatements || []), statement], activityLogs: logs };
+      broadcastChange(newState);
+      return newState;
+    });
+  };
+
+  const updateProblemStatement = (id: string, updates: Partial<ProblemStatement>, userId: string) => {
+    setData(prev => {
+      const statements = [...(prev.problemStatements || [])];
+      const index = statements.findIndex(e => e.id === id);
+      if (index === -1) return prev;
+      
+      const oldE = statements[index];
+      statements[index] = { ...oldE, ...updates };
+      
+      const logs = [...(prev.activityLogs || [])];
+      if (updates.archivedAt && !oldE.archivedAt) {
+        logs.push({
+          id: Math.random().toString(36).substr(2, 9),
+          userId,
+          hackathonId: oldE.hackathonId,
+          action: 'ARCHIVED',
+          entityType: 'PROBLEM_STATEMENT',
+          entityId: id,
+          field: 'Title',
+          oldValue: oldE.title,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+      const newState = { ...prev, problemStatements: statements, activityLogs: logs };
+      broadcastChange(newState);
+      return newState;
+    });
+  };
+
+  const verifyHackathon = (id: string, userId: string) => {
+    setData(prev => {
+      const hackathons = [...prev.hackathons];
+      const index = hackathons.findIndex(h => h.id === id);
+      if (index === -1) return prev;
+      
+      hackathons[index] = { ...hackathons[index], verifiedAt: new Date().toISOString(), verifiedBy: userId };
+      
+      const logs = [...(prev.activityLogs || []), {
+        id: Math.random().toString(36).substr(2, 9),
+        userId,
+        hackathonId: id,
+        action: 'VERIFIED' as const,
+        entityType: 'HACKATHON' as const,
+        entityId: id,
+        timestamp: new Date().toISOString()
+      }];
+      
+      const newState = { ...prev, hackathons, activityLogs: logs };
+      broadcastChange(newState);
+      return newState;
+    });
+  };
+
+  const deleteHackathon = (id: string, userId: string) => {
+    setData(prev => {
+      const hackathons = prev.hackathons.filter(h => h.id !== id);
+      const logs = [...(prev.activityLogs || []), {
+        id: Math.random().toString(36).substr(2, 9),
+        userId,
+        hackathonId: id,
+        action: 'ARCHIVED' as const, // We use ARCHIVED visually but we are deleting it
+        entityType: 'HACKATHON' as const,
+        entityId: id,
+        field: 'DELETED',
+        timestamp: new Date().toISOString()
+      }];
+      const newState = { ...prev, hackathons, activityLogs: logs };
+      broadcastChange(newState);
+      return newState;
+    });
+  };
+
+  const updateRole = (member: string, role: Role) => {
+    setData(prev => {
+      const newState = { ...prev, roles: { ...(prev.roles || {}), [member]: role } };
       broadcastChange(newState);
       return newState;
     });
   };
 
   return (
-    <StoreContext.Provider value={{ data, squadInfo, handleJoinSquad, updateRegistrationStatus, updateChecklistItem, updateProject, addChatMessage, updatePowerHistory, addHackathon }}>
+    <StoreContext.Provider value={{ 
+      data, squadInfo, handleJoinSquad, updateRegistrationStatus, updateChecklistItem, 
+      updateProject, addChatMessage, updatePowerHistory, addHackathon,
+      updateHackathon, deleteHackathon, addTimelineEvent, updateTimelineEvent, addProblemStatement,
+      updateProblemStatement, verifyHackathon, updateRole 
+    }}>
       {children}
     </StoreContext.Provider>
   );

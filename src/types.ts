@@ -21,7 +21,7 @@ export interface Hackathon {
   name: string;
   platform: Platform;
   format: string;
-  registrationDeadline: string; // ISO date or null
+  registrationDeadline: string | null;
   submissionDeadline: string | null;
   eventDates: string;
   registrationLink: string;
@@ -30,7 +30,64 @@ export interface Hackathon {
   notes?: string;
   teams: TeamMember[];
   projects?: Project[];
+  
+  // Mission Editor additions
+  organizer?: string;
+  description?: string;
+  website?: string;
+  prizePool?: string;
+  location?: string;
+  mode?: string; // Online / Offline / Hybrid
+  eligibility?: string;
+  teamSizeMin?: number;
+  teamSizeMax?: number;
+  
+  discordLink?: string;
+  githubLink?: string;
+  otherLink?: string;
+  
+  status?: string; // Upcoming / Registration Open / Building / Submitted / Finalist / Completed / Archived
+  
+  verifiedAt?: string;
+  verifiedBy?: string;
+  archivedAt?: string;
 }
+
+export interface TimelineEvent {
+  id: string;
+  hackathonId: string;
+  title: string;
+  date: string;
+  time?: string;
+  description?: string;
+  type?: string;
+  status?: string;
+  order?: number;
+  archivedAt?: string;
+}
+
+export interface ProblemStatement {
+  id: string;
+  hackathonId: string;
+  title: string;
+  description: string;
+  archivedAt?: string;
+}
+
+export interface ActivityLog {
+  id: string;
+  userId: string;
+  hackathonId: string;
+  action: 'CREATED' | 'UPDATED' | 'ARCHIVED' | 'RESTORED' | 'VERIFIED';
+  entityType: 'HACKATHON' | 'TIMELINE' | 'PROBLEM_STATEMENT' | 'LINK' | 'FIELD';
+  entityId: string;
+  field?: string;
+  oldValue?: string;
+  newValue?: string;
+  timestamp: string;
+}
+
+export type Role = 'VIEWER' | 'EDITOR' | 'OWNER';
 
 export interface ChatMessage {
   id: string;
@@ -51,4 +108,10 @@ export interface StoreData {
   // Chat messages per hackathon: hackathonId -> ChatMessage[]
   chats: Record<string, ChatMessage[]>;
   powerHistory?: number[];
+  
+  // Collaborative Editing Data
+  timelineEvents?: TimelineEvent[];
+  problemStatements?: ProblemStatement[];
+  activityLogs?: ActivityLog[];
+  roles?: Record<string, Role>;
 }

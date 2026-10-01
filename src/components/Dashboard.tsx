@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../useStore';
 import { differenceInHours, isPast, parseISO } from 'date-fns';
-import { Link as LinkIcon, X, Send, MessageSquare, Check, CheckSquare, Minus, Users, FolderKanban, Zap, Activity, Flame, Shield, ArrowRight, Target, Filter } from 'lucide-react';
+import { Link as LinkIcon, X, Send, MessageSquare, Check, CheckSquare, Minus, Users, FolderKanban, Zap, Activity, Flame, Shield, ArrowRight, Target, Filter, Edit2, Plus, History } from 'lucide-react';
+import { MissionEditor } from './MissionEditor';
+import { ActivityLogView } from './ActivityLogView';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Hackathon } from '../types';
 import { calculateHackathonStages, calculatePowerLevel, getOverallProgress } from '../utils/dragonBalls';
@@ -18,12 +20,17 @@ import { getCopy } from '../copy';
 export default function Dashboard() {
   const { actualTheme } = useTheme();
   const copy = getCopy(actualTheme);
-  const { data, addChatMessage, updateRegistrationStatus, updatePowerHistory, updateChecklistItem, updateProject, addHackathon } = useStore();
+  const { data, addChatMessage, updateRegistrationStatus, updatePowerHistory, updateChecklistItem, updateProject } = useStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [chatInput, setChatInput] = useState('');
   const [senderName, setSenderName] = useState(() => localStorage.getItem('hacktrack-sender') || data.members[0]);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
+  const [showNeedsVerification, setShowNeedsVerification] = useState(false);
+  const [editingMission, setEditingMission] = useState<string | null | 'NEW'>(null);
+  const [showGlobalActivity, setShowGlobalActivity] = useState(false);
+  const [showMissionActivity, setShowMissionActivity] = useState<string | null>(null);
 
   const globalProgress = getOverallProgress(data.hackathons, data);
 
@@ -107,6 +114,16 @@ export default function Dashboard() {
   };
 
   const filteredHackathons = sortedHackathons.filter(h => {
+    if (showArchived) return !!h.archivedAt;
+    if (h.archivedAt) return false;
+    
+    if (showNeedsVerification) {
+      if (!h.verifiedAt) return true;
+      const verifiedDate = new Date(h.verifiedAt);
+      const daysSinceVerified = (Date.now() - verifiedDate.getTime()) / (1000 * 60 * 60 * 24);
+      return daysSinceVerified > 7;
+    }
+    
     if (!activeFilter) return true;
     const stages = calculateHackathonStages(h, data);
     const activeStage = stages.find(s => s.state === 'IN_PROGRESS') || stages.find(s => s.state === 'NOT_STARTED');
@@ -374,32 +391,42 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="flex justify-between items-end mb-4 relative z-10">
-          <div></div>
-          <button 
-            onClick={() => {
-              const name = window.prompt('Enter Hackathon Name:');
-              if (!name) return;
-              const platform = window.prompt('Enter Platform (e.g. Devfolio, Devpost, Custom):') || 'Custom';
-              const newHackathon = {
-                id: name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-                name,
-                platform,
-                format: 'Online',
-                registrationDeadline: new Date().toISOString().split('T')[0],
-                submissionDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                eventDates: 'TBD',
-                registrationLink: '',
-                submissionLink: '',
-                teams: [{ teamLabel: 'Team A', members: [] }],
-                projects: []
-              };
-              addHackathon(newHackathon);
-            }}
-            className={`px-4 py-2 font-bold text-xs uppercase tracking-wider rounded transition-colors ${actualTheme === 'dark' ? 'bg-primary/20 text-primary border border-primary/40 hover:bg-primary/30' : 'bg-primary text-primaryForeground hover:bg-primary/90'}`}
-          >
-            + ADD NEW HACKATHON
-          </button>
+        <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-4 relative z-10">
+          <div className="flex items-center gap-3">
+            <span className={`text-[10px] font-black uppercase tracking-widest ${actualTheme === 'dark' ? 'text-[var(--text-gray-400)]' : 'text-muted'}`}>COMMAND CENTER</span>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setEditingMission('NEW')}
+                className={`px-3 py-1.5 font-black text-[10px] flex items-center gap-1 uppercase tracking-wider rounded transition-all ${actualTheme === 'dark' ? 'bg-primary/20 text-primary border border-primary/40 hover:bg-primary/30' : 'bg-primary text-primaryForeground hover:bg-primary/90 shadow-sm'}`}
+              >
+                <Plus size={12} /> ADD HACKATHON
+              </button>
+              <button 
+                onClick={() => setShowGlobalActivity(true)}
+                className={`px-3 py-1.5 font-black text-[10px] flex items-center gap-1 uppercase tracking-wider rounded transition-colors ${actualTheme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-foreground border border-borderMuted' : 'bg-panelAlt border border-borderSubtle text-muted hover:text-foreground'}`}
+              >
+                <History size={12} /> ACTIVITY
+              </button>
+              <button 
+                onClick={() => {
+                  setShowArchived(false);
+                  setShowNeedsVerification(!showNeedsVerification);
+                }}
+                className={`px-3 py-1.5 font-black text-[10px] flex items-center gap-1 uppercase tracking-wider rounded transition-colors ${showNeedsVerification ? (actualTheme === 'dark' ? 'bg-warning/20 text-warning border border-warning/40' : 'bg-warning/10 text-warning border border-warning/20') : (actualTheme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-foreground border border-borderMuted' : 'bg-panelAlt border border-borderSubtle text-muted hover:text-foreground')}`}
+              >
+                NEEDS VERIFICATION {showNeedsVerification && <X size={10} />}
+              </button>
+              <button 
+                onClick={() => {
+                  setShowNeedsVerification(false);
+                  setShowArchived(!showArchived);
+                }}
+                className={`px-3 py-1.5 font-black text-[10px] flex items-center gap-1 uppercase tracking-wider rounded transition-colors ${showArchived ? (actualTheme === 'dark' ? 'bg-red-500/20 text-red-500 border border-red-500/40' : 'bg-red-500/10 text-red-600 border border-red-500/20') : (actualTheme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-foreground border border-borderMuted' : 'bg-panelAlt border border-borderSubtle text-muted hover:text-foreground')}`}
+              >
+                ARCHIVED {showArchived && <X size={10} />}
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 relative z-10">
@@ -546,7 +573,7 @@ export default function Dashboard() {
                     )}
                   </div>
                   
-                  <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-2 mt-auto">
+                  <div className="pt-4 flex flex-col gap-3.5 mt-auto">
                     <div className="flex items-center gap-2">
                       <span className={`text-[9px] font-black uppercase tracking-widest ${actualTheme === 'dark' ? 'text-[var(--text-gray-500)]' : 'text-muted'}`}>{copy.combatUnits}</span>
                       <div className="flex -space-x-1.5">
@@ -563,16 +590,44 @@ export default function Dashboard() {
                       </div>
                     </div>
                     
-                    <button className={`relative overflow-hidden flex items-center justify-center sm:justify-start w-full sm:w-auto gap-2 text-xs font-black px-4 py-2.5 rounded-sm transition-all duration-300 ${
-                      actualTheme === 'dark' 
-                        ? (isUrgent 
-                          ? 'bg-primary text-[#070707] border border-primaryLight box-glow-orange group-hover:-translate-y-1' 
-                          : 'bg-background text-primaryLight border border-primary/40 group-hover:bg-primary group-hover:text-[#070707] group-hover:border-primaryLight group-hover:box-glow-orange group-hover:-translate-y-1')
-                        : 'bg-primary text-primaryForeground font-bold border border-transparent hover:bg-accentForeground group-hover:-translate-y-1 rounded-md'
-                    }`}>
-                      {actualTheme === 'dark' && <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/40 to-white/0 translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-700"></div>}
-                      {copy.warRoom} <ArrowRight size={14} />
-                    </button>
+                    <div className="flex flex-wrap items-center gap-2 z-20 pt-1 border-t border-borderSubtle/50">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingMission(h.id);
+                        }}
+                        className={`relative flex items-center justify-center flex-1 min-w-[80px] sm:flex-none sm:w-auto gap-1.5 text-[10px] font-black px-3 py-2.5 rounded transition-all duration-300 ${
+                          actualTheme === 'dark' 
+                            ? 'bg-[#0f0700] hover:bg-primary/20 text-primary border border-primary/40 hover:border-primary/60 shadow-[0_0_10px_rgba(245,124,0,0.2)] hover:shadow-[0_0_15px_rgba(245,124,0,0.4)] hover:-translate-y-0.5' 
+                            : 'bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 hover:-translate-y-0.5'
+                        }`}
+                      >
+                        <Edit2 size={12} /> EDIT
+                      </button>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowMissionActivity(h.id);
+                        }}
+                        className={`relative flex items-center justify-center flex-1 min-w-[80px] sm:flex-none sm:w-auto gap-1.5 text-[10px] font-black px-3 py-2.5 rounded transition-all duration-300 ${
+                          actualTheme === 'dark' 
+                            ? 'bg-white/5 hover:bg-white/10 text-[var(--text-gray-400)] hover:text-foreground border border-borderMuted hover:border-[var(--text-gray-500)] hover:-translate-y-0.5' 
+                            : 'bg-panelAlt text-muted border border-borderSubtle hover:bg-borderSubtle hover:text-foreground hover:-translate-y-0.5'
+                        }`}
+                      >
+                        <History size={12} /> LOGS
+                      </button>
+                      <button className={`relative overflow-hidden flex items-center justify-center w-full sm:flex-1 sm:min-w-[140px] gap-2 text-xs font-black px-4 py-2.5 rounded-sm transition-all duration-300 ${
+                        actualTheme === 'dark' 
+                          ? (isUrgent 
+                            ? 'bg-primary text-[#070707] border border-primaryLight box-glow-orange hover:-translate-y-1' 
+                            : 'bg-background text-primaryLight border border-primary/40 hover:bg-primary hover:text-[#070707] hover:border-primaryLight hover:box-glow-orange hover:-translate-y-1')
+                          : 'bg-primary text-primaryForeground font-bold border border-transparent hover:bg-accentForeground hover:-translate-y-1 rounded-md'
+                      }`}>
+                        {actualTheme === 'dark' && <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/40 to-white/0 translate-x-[-150%] hover:translate-x-[150%] transition-transform duration-700"></div>}
+                        <span className="truncate">{copy.warRoom}</span> <ArrowRight size={14} className="shrink-0" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -605,12 +660,26 @@ export default function Dashboard() {
                 className="bg-card w-full max-w-5xl max-h-[90vh] rounded-xl border border-primary/30 shadow-[0_20px_60px_rgba(245,124,0,0.2)] flex flex-col overflow-hidden relative"
               >
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primaryLight via-primary to-danger z-50"></div>
-                <button 
-                  onClick={() => setSelectedId(null)}
-                  className={`absolute top-6 right-6 p-2.5 backdrop-blur-md rounded-lg transition-all z-50 group flex items-center justify-center ${actualTheme === 'dark' ? 'bg-overlay hover:bg-primary/20 border border-borderMuted hover:border-primary/50 text-[var(--text-gray-400)] hover:text-foreground shadow-[0_4px_20px_rgba(0,0,0,0.3)]' : 'bg-card border border-borderSubtle hover:bg-panelAlt text-muted hover:text-foreground shadow-sm'}`}
-                >
-                  <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
-                </button>
+                <div className="absolute top-6 right-6 flex items-center gap-2 z-50">
+                  <button 
+                    onClick={() => setShowMissionActivity(selectedHackathon.id)}
+                    className={`px-3 py-2 backdrop-blur-md rounded-lg flex items-center gap-1 text-[10px] font-black uppercase tracking-widest transition-all ${actualTheme === 'dark' ? 'bg-overlay hover:bg-white/10 border border-borderMuted text-[var(--text-gray-400)] hover:text-foreground' : 'bg-card border border-borderSubtle hover:bg-panelAlt text-muted hover:text-foreground shadow-sm'}`}
+                  >
+                    <History size={14} /> ACTIVITY
+                  </button>
+                  <button 
+                    onClick={() => setEditingMission(selectedHackathon.id)}
+                    className={`px-3 py-2 backdrop-blur-md rounded-lg flex items-center gap-1 text-[10px] font-black uppercase tracking-widest transition-all ${actualTheme === 'dark' ? 'bg-[#0f0700] hover:bg-primary/20 border border-primary/40 text-primary shadow-[0_0_15px_rgba(245,124,0,0.3)]' : 'bg-primary text-primaryForeground hover:bg-primary/90 shadow-sm'}`}
+                  >
+                    <Edit2 size={14} /> EDIT MISSION
+                  </button>
+                  <button 
+                    onClick={() => setSelectedId(null)}
+                    className={`p-2 backdrop-blur-md rounded-lg transition-all group flex items-center justify-center ${actualTheme === 'dark' ? 'bg-overlay hover:bg-primary/20 border border-borderMuted hover:border-primary/50 text-[var(--text-gray-400)] hover:text-foreground shadow-[0_4px_20px_rgba(0,0,0,0.3)]' : 'bg-card border border-borderSubtle hover:bg-panelAlt text-muted hover:text-foreground shadow-sm'}`}
+                  >
+                    <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+                  </button>
+                </div>
                 
                 <div className="w-full h-full overflow-y-auto custom-scrollbar flex flex-col relative">
               
@@ -680,16 +749,20 @@ export default function Dashboard() {
                       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 pb-2">
                         <span className={`text-sm font-bold uppercase tracking-wide ${actualTheme === 'dark' ? 'text-[var(--text-gray-400)]' : 'text-muted'}`}>Registration</span>
                         <div className="text-foreground font-black uppercase text-right flex flex-wrap items-center gap-2">
-                          <div className={`text-xs ${actualTheme === 'dark' ? 'text-[var(--text-gray-500)]' : 'text-muted'}`}>{selectedHackathon.registrationDeadline}</div>
-                          <div className={`px-2 py-1 rounded tracking-widest ${actualTheme === 'dark' ? 'bg-white/10' : 'bg-panel border border-borderSubtle'}`}><LiveCountdown dateStr={selectedHackathon.registrationDeadline} /></div>
+                          <div className={`text-xs ${actualTheme === 'dark' ? 'text-[var(--text-gray-500)]' : 'text-muted'}`}>{selectedHackathon.registrationDeadline || 'N/A'}</div>
+                          {selectedHackathon.registrationDeadline && (
+                            <div className={`px-2 py-1 rounded tracking-widest ${actualTheme === 'dark' ? 'bg-white/10' : 'bg-panel border border-borderSubtle'}`}><LiveCountdown dateStr={selectedHackathon.registrationDeadline} /></div>
+                          )}
                         </div>
                       </div>
-                      <KamehamehaTrack 
-                        label="Registration" 
-                        startTime={parseISO(selectedHackathon.registrationDeadline).getTime() - (14 * 24 * 60 * 60 * 1000)} 
-                        deadline={parseISO(selectedHackathon.registrationDeadline).getTime()} 
-                        completed={stages[1].state === 'COMPLETED' || stages[1].state === 'COMPLETED_FINAL'} 
-                      />
+                      {selectedHackathon.registrationDeadline && (
+                        <KamehamehaTrack 
+                          label="Registration" 
+                          startTime={parseISO(selectedHackathon.registrationDeadline).getTime() - (14 * 24 * 60 * 60 * 1000)} 
+                          deadline={parseISO(selectedHackathon.registrationDeadline).getTime()} 
+                          completed={stages[1].state === 'COMPLETED' || stages[1].state === 'COMPLETED_FINAL'} 
+                        />
+                      )}
                       <div className={`flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-t pt-4 pb-2 mt-4 ${actualTheme === 'dark' ? 'border-borderSubtle' : 'border-borderMuted'}`}>
                         <span className={`text-sm font-bold uppercase tracking-wide ${actualTheme === 'dark' ? 'text-[var(--text-gray-400)]' : 'text-muted'}`}>Submission</span>
                         <div className="text-foreground font-black uppercase text-right flex flex-wrap items-center gap-2">
@@ -1049,6 +1122,66 @@ export default function Dashboard() {
             </motion.div>
             );
             })()}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* External Modals */}
+      <AnimatePresence>
+        {editingMission && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-6 bg-background/70 backdrop-blur-md"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className={`w-full max-w-5xl h-[90vh] bg-card border shadow-2xl rounded-xl overflow-hidden flex flex-col ${actualTheme === 'dark' ? 'border-primary/30' : 'border-borderSubtle'}`}
+            >
+              <MissionEditor 
+                hackathonId={editingMission === 'NEW' ? null : editingMission} 
+                onClose={() => setEditingMission(null)} 
+              />
+            </motion.div>
+          </motion.div>
+        )}
+
+        {showGlobalActivity && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-6 bg-background/70 backdrop-blur-md"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="w-full max-w-3xl h-[80vh] bg-card border border-borderSubtle shadow-2xl rounded-xl overflow-hidden flex flex-col p-6"
+            >
+              <ActivityLogView onClose={() => setShowGlobalActivity(false)} />
+            </motion.div>
+          </motion.div>
+        )}
+
+        {showMissionActivity && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-6 bg-background/70 backdrop-blur-md"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="w-full max-w-3xl h-[80vh] bg-card border border-borderSubtle shadow-2xl rounded-xl overflow-hidden flex flex-col p-6"
+            >
+              <ActivityLogView hackathonId={showMissionActivity!} onClose={() => setShowMissionActivity(null)} />
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
